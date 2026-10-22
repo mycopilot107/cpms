@@ -1,0 +1,4 @@
+# Keep this directory, but never commit the APK binary itself.
+*
+!.gitignore
+!README.md

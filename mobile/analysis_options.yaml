@@ -1,0 +1,11 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    # Keep the sample lean; these would otherwise be warnings during a demo.
+    avoid_print: ignore
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_final_locals: true
