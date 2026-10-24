@@ -58,7 +58,7 @@ class AuthController extends Controller
             $credentials['device_name'] ?? 'mobile',
         );
 
-        $user->loadMissing('company');
+        $user->loadMissing(['company', 'role']);
 
         return response()->json([
             'token' => $plainToken,
@@ -73,7 +73,7 @@ class AuthController extends Controller
     public function me(Request $request): UserResource
     {
         $user = $request->user();
-        $user->loadMissing('company');
+        $user->loadMissing(['company', 'role']);
 
         return new UserResource($user);
     }

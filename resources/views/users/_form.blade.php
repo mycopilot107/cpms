@@ -37,7 +37,7 @@
             @else
                 <select id="role" name="role" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     @foreach ($roles as $role)
-                        <option value="{{ $role }}" @selected(old('role', $user->role ?? 'worker') === $role)>{{ ucfirst($role) }}</option>
+                        <option value="{{ $role->slug }}" @selected(old('role', $user?->role?->slug ?? 'worker') === $role->slug)>{{ $role->name }}</option>
                     @endforeach
                 </select>
             @endif

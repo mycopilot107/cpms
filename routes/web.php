@@ -90,6 +90,7 @@ Route::get('blog/{slug}', [PageController::class, 'blogPost'])
 Route::get('case-studies', [PageController::class, 'caseStudies'])->name('case-studies');
 Route::get('faq', [PageController::class, 'faq'])->name('faq');
 Route::get('help', [PageController::class, 'help'])->name('help');
+Route::get('how-it-works', [PageController::class, 'howItWorks'])->name('how-it-works');
 
 // Legal — exact URLs requested
 Route::get('privacy-policy', [PageController::class, 'privacy'])->name('privacy');

@@ -26,13 +26,13 @@ class ProjectPolicy
 
     public function create(User $user): bool
     {
-        return $user->isActive() && in_array($user->role, self::MANAGERS, true);
+        return $user->isActive() && in_array($user->role?->slug, self::MANAGERS, true);
     }
 
     public function update(User $user, Project $project): bool
     {
         return $this->sameCompany($user, $project)
-            && in_array($user->role, self::MANAGERS, true);
+            && in_array($user->role?->slug, self::MANAGERS, true);
     }
 
     public function delete(User $user, Project $project): bool

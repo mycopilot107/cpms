@@ -28,9 +28,7 @@ use Illuminate\Support\Str;
  */
 class SocialAuthController extends Controller
 {
-    public function __construct(protected SocialAuthService $social)
-    {
-    }
+    public function __construct(protected SocialAuthService $social) {}
 
     /** Redirect the user to the provider's consent screen. */
     public function redirect(Request $request, string $provider): RedirectResponse
@@ -161,7 +159,7 @@ class SocialAuthController extends Controller
 
             // company_id / role / status / provider* are guarded, so set them
             // explicitly here rather than through mass assignment.
-            $user = new User();
+            $user = new User;
             $user->company_id = $company->id;
             $user->name = $name;
             $user->email = $email;
@@ -169,7 +167,7 @@ class SocialAuthController extends Controller
             $user->provider = $provider;
             $user->provider_id = $profile['id'];
             $user->avatar = $profile['avatar'];
-            $user->role = User::ROLE_OWNER;
+            $user->assignRole(User::ROLE_OWNER);
             $user->status = 'active';
             $user->email_verified_at = $now;
             $user->save();

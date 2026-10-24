@@ -31,7 +31,7 @@
             <select id="assigned_to" name="assigned_to" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                 <option value="">Unassigned</option>
                 @foreach ($assignees as $assignee)
-                    <option value="{{ $assignee->id }}" @selected((string) old('assigned_to', $task->assigned_to ?? '') === (string) $assignee->id)>{{ $assignee->name }} ({{ ucfirst($assignee->role) }})</option>
+                    <option value="{{ $assignee->id }}" @selected((string) old('assigned_to', $task->assigned_to ?? '') === (string) $assignee->id)>{{ $assignee->name }} ({{ $assignee->role?->name }})</option>
                 @endforeach
             </select>
         </div>

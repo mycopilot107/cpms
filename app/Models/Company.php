@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 class Company extends Model
 {
@@ -15,12 +16,16 @@ class Company extends Model
     public const TRIAL_DAYS = 15;
 
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_SUSPENDED = 'suspended';
+
     public const STATUS_INACTIVE = 'inactive';
 
     /** Access state shown in the platform console. */
     public const SUB_STATE_SUBSCRIBED = 'subscribed';
+
     public const SUB_STATE_TRIAL = 'trial';
+
     public const SUB_STATE_EXPIRED = 'expired';
 
     protected $fillable = [
@@ -67,7 +72,7 @@ class Company extends Model
     /** The owner account created during company registration. */
     public function owner(): HasOne
     {
-        return $this->hasOne(User::class)->where('role', User::ROLE_OWNER);
+        return $this->hasOne(User::class)->where('role_id', Role::idFor(User::ROLE_OWNER));
     }
 
     public function projects(): HasMany
@@ -114,6 +119,7 @@ class Company extends Model
 
     /** Cache within a request so the gate/nav/seat-check don't re-query. */
     private ?Subscription $activeSubscriptionCache = null;
+
     private bool $activeSubscriptionResolved = false;
 
     /** The current paid subscription that is active and not past its end date. */
@@ -170,7 +176,7 @@ class Company extends Model
      * lapsed it is the most recent expiry we know about (so the console can
      * show "expired on …"). Null only when nothing has ever been set.
      */
-    public function accessEndsAt(): ?\Illuminate\Support\Carbon
+    public function accessEndsAt(): ?Carbon
     {
         if ($this->hasActiveSubscription()) {
             return $this->activeSubscription()?->ends_at;

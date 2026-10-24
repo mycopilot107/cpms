@@ -112,7 +112,7 @@
                     @foreach ($company->users as $member)
                         <tr>
                             <td class="py-2 pr-4 font-medium text-slate-800">{{ $member->name }}</td>
-                            <td class="py-2 pr-4 text-slate-600">{{ ucfirst($member->role) }}</td>
+                            <td class="py-2 pr-4 text-slate-600">{{ $member->role?->name }}</td>
                             <td class="py-2 pr-4 text-slate-600">{{ $member->email }}</td>
                             <td class="py-2 pr-4 text-slate-600">{{ ucfirst($member->status) }}</td>
                         </tr>

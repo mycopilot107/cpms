@@ -27,7 +27,7 @@ class TaskPolicy
 
     public function create(User $user): bool
     {
-        return $user->isActive() && in_array($user->role, self::PLANNERS, true);
+        return $user->isActive() && in_array($user->role?->slug, self::PLANNERS, true);
     }
 
     /** Mobile task access is limited to assignees and active company planners. */
@@ -46,14 +46,14 @@ class TaskPolicy
 
         // Planners edit any task; the assignee may update their own task
         // (e.g. move status/progress).
-        return in_array($user->role, self::PLANNERS, true)
+        return in_array($user->role?->slug, self::PLANNERS, true)
             || $task->assigned_to === $user->id;
     }
 
     public function delete(User $user, Task $task): bool
     {
         return $this->sameCompany($user, $task)
-            && in_array($user->role, self::PLANNERS, true);
+            && in_array($user->role?->slug, self::PLANNERS, true);
     }
 
     private function sameCompany(User $user, Task $task): bool

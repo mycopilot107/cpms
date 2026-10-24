@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\Subscription;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -64,7 +65,7 @@ class PlatformController extends Controller
     {
         $company->load([
             'owner',
-            'users' => fn ($query) => $query->orderBy('name'),
+            'users' => fn ($query) => $query->with('role')->orderBy('name'),
             'subscriptions' => fn ($query) => $query->with('pricingPlan')->orderByDesc('id'),
         ]);
 
@@ -104,7 +105,7 @@ class PlatformController extends Controller
      * (active status and not past their end date). Mirrors
      * Company::activeSubscription() so the counts and the per-row state agree.
      */
-    private function scopeCurrentlyActive(\Illuminate\Database\Eloquent\Builder $query): void
+    private function scopeCurrentlyActive(Builder $query): void
     {
         $query->where('status', Subscription::STATUS_ACTIVE)
             ->where(function ($inner): void {

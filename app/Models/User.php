@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,15 +11,21 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     public const ROLE_OWNER = 'owner';
+
     public const ROLE_ADMIN = 'admin';
+
     public const ROLE_MANAGER = 'manager';
+
     public const ROLE_ENGINEER = 'engineer';
+
     public const ROLE_SUPERVISOR = 'supervisor';
+
     public const ROLE_WORKER = 'worker';
+
     public const ROLE_ACCOUNTANT = 'accountant';
 
     public const ROLES = [
@@ -34,11 +41,11 @@ class User extends Authenticatable
     /**
      * Mass-assignable attributes.
      *
-     * SECURITY: company_id, role and status are intentionally NOT fillable.
+     * SECURITY: company_id, role_id and status are intentionally NOT fillable.
      * They control tenant ownership and privilege level, so they must be set
      * explicitly in server-side code (registration, user management) and never
      * from raw request input — otherwise a user could escalate their role or
-     * jump tenants by posting company_id / role fields.
+     * jump tenants by posting company_id / role_id fields.
      *
      * @var list<string>
      */
@@ -91,6 +98,18 @@ class User extends Authenticatable
         return $this->belongsTo(Company::class);
     }
 
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /** Point this account at a role by its slug. role_id stays guarded. */
+    public function assignRole(string $slug): void
+    {
+        $this->role_id = Role::idFor($slug);
+        $this->unsetRelation('role');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Role / status helpers
@@ -99,18 +118,18 @@ class User extends Authenticatable
 
     public function hasRole(string $role): bool
     {
-        return $this->role === $role;
+        return $this->role?->slug === $role;
     }
 
     public function isOwner(): bool
     {
-        return $this->role === self::ROLE_OWNER;
+        return $this->hasRole(self::ROLE_OWNER);
     }
 
     /** Owners and admins can manage the company and its users. */
     public function isAdmin(): bool
     {
-        return in_array($this->role, [self::ROLE_OWNER, self::ROLE_ADMIN], true);
+        return $this->hasRole(self::ROLE_OWNER) || $this->hasRole(self::ROLE_ADMIN);
     }
 
     public function isActive(): bool
@@ -156,7 +175,7 @@ class User extends Authenticatable
 
     public function canViewFinance(): bool
     {
-        return $this->isActive() && in_array($this->role, self::FINANCE_ROLES, true);
+        return $this->isActive() && in_array($this->role?->slug, self::FINANCE_ROLES, true);
     }
 
     public function canManageFinance(): bool
@@ -166,11 +185,11 @@ class User extends Authenticatable
 
     public function canViewReports(): bool
     {
-        return $this->isActive() && in_array($this->role, self::FINANCE_ROLES, true);
+        return $this->isActive() && in_array($this->role?->slug, self::FINANCE_ROLES, true);
     }
 
     public function canManagePlanning(): bool
     {
-        return $this->isActive() && in_array($this->role, self::PLANNING_ROLES, true);
+        return $this->isActive() && in_array($this->role?->slug, self::PLANNING_ROLES, true);
     }
 }

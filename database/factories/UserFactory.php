@@ -3,13 +3,14 @@
 namespace Database\Factories;
 
 use App\Models\Company;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -32,7 +33,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'phone' => fake()->numerify('+91-##########'),
-            'role' => User::ROLE_WORKER,
+            'role_id' => Role::idFor(User::ROLE_WORKER),
             'status' => 'active',
             'remember_token' => Str::random(10),
         ];
@@ -54,7 +55,7 @@ class UserFactory extends Factory
     public function owner(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => User::ROLE_OWNER,
+            'role_id' => Role::idFor(User::ROLE_OWNER),
         ]);
     }
 

@@ -66,7 +66,7 @@
                     @foreach ([
                         ['Project & task reports', 'Filterable status across projects, exportable to CSV.'],
                         ['Cost & progress reports', 'Budget burn and completion, ready for the client meeting.'],
-                        ['Role-based access', 'Owners, admins, and members see only what their role allows.'],
+                        ['Role-based access', 'Seven roles, listed below. Each person opens only the screens that role allows.'],
                         ['Multi-company isolation', 'Each company\'s data is fully separated — never shared or visible across tenants.'],
                     ] as $f)
                         <div class="border-l-2 border-slate-200 pl-4">
@@ -77,6 +77,32 @@
                 </div>
             </div>
 
+        </div>
+    </section>
+
+    <section id="team-roles" class="border-t border-slate-200 bg-white">
+        <div class="mx-auto max-w-6xl px-5 py-16 sm:py-20 lg:px-8">
+            <h2 class="font-display text-3xl font-bold tracking-tight text-slate-900">Who can do what</h2>
+            <p class="mt-4 max-w-2xl text-lg text-slate-600">Every person on a company account has one role. The role is what decides the screens they can open. See <a href="{{ route('how-it-works') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">how it works</a> for getting started and app sign-in.</p>
+
+            <div class="mt-10 overflow-x-auto rounded-xl border border-slate-200">
+                <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th scope="col" class="px-5 py-3 font-display text-sm font-semibold text-slate-900">Role</th>
+                            <th scope="col" class="px-5 py-3 font-display text-sm font-semibold text-slate-900">What they can do</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 bg-white">
+                        @foreach ($roles as $role)
+                            <tr>
+                                <th scope="row" class="whitespace-nowrap px-5 py-4 align-top font-display font-semibold text-slate-900">{{ $role->name }}</th>
+                                <td class="px-5 py-4 align-top leading-relaxed text-slate-600">{{ $role->description }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </section>
 

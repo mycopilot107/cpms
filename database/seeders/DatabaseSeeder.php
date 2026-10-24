@@ -100,7 +100,7 @@ class DatabaseSeeder extends Seeder
             'password' => 'password',
         ]);
         $user->company_id = $company->id;
-        $user->role = $role;
+        $user->assignRole($role);
         $user->status = 'active';
         $user->email_verified_at = now();
         $user->save();

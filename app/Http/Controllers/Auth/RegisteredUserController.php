@@ -42,13 +42,13 @@ class RegisteredUserController extends Controller
 
             // company_id / role / status are guarded, so set them explicitly
             // here rather than through mass assignment.
-            $user = new User();
+            $user = new User;
             $user->company_id = $company->id;
             $user->name = $data['name'];
             $user->email = $data['email'];
             $user->phone = $data['phone'] ?? null;
             $user->password = $data['password']; // hashed by the model cast
-            $user->role = User::ROLE_OWNER;
+            $user->assignRole(User::ROLE_OWNER);
             $user->status = 'active';
             $user->email_verified_at = $now;
             $user->save();

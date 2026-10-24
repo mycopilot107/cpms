@@ -31,7 +31,7 @@
                         </td>
                         <td class="px-5 py-3 text-sm text-slate-600">{{ $user->email }}</td>
                         <td class="px-5 py-3">
-                            <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">{{ ucfirst($user->role) }}</span>
+                            <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">{{ $user->role?->name }}</span>
                         </td>
                         <td class="px-5 py-3">
                             @if ($user->status === 'active')
@@ -77,7 +77,7 @@
                     @endif
                 </div>
                 <div class="mt-3 flex items-center justify-between">
-                    <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">{{ ucfirst($user->role) }}</span>
+                    <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">{{ $user->role?->name }}</span>
                     <div class="flex items-center gap-3">
                         @can('update', $user)
                             <a href="{{ route('users.edit', $user) }}" class="text-sm text-indigo-600 hover:text-indigo-500">Edit</a>

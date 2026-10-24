@@ -52,6 +52,7 @@ class SitemapController extends Controller
             ['route' => 'landing.milestones',      'priority' => '0.7', 'freq' => 'monthly'],
             ['route' => 'landing.payments',        'priority' => '0.7', 'freq' => 'monthly'],
 
+            ['route' => 'how-it-works',      'priority' => '0.7', 'freq' => 'monthly'],
             ['route' => 'app.download-page', 'priority' => '0.6', 'freq' => 'monthly'],
             ['route' => 'reviews',           'priority' => '0.6', 'freq' => 'monthly'],
             ['route' => 'case-studies',      'priority' => '0.6', 'freq' => 'monthly'],

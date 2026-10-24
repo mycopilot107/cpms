@@ -4,17 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    /** Roles that can be assigned to team members (everyone but the owner). */
-    private function assignableRoles(): array
+    /**
+     * Roles that can be assigned to team members (everyone but the owner).
+     *
+     * @return Collection<int, Role>
+     */
+    private function assignableRoles(): Collection
     {
-        return array_values(array_diff(User::ROLES, [User::ROLE_OWNER]));
+        return Role::query()
+            ->where('slug', '!=', User::ROLE_OWNER)
+            ->orderBy('sort_order')
+            ->get();
     }
 
     public function index(Request $request): View
@@ -23,7 +32,10 @@ class UserController extends Controller
 
         // Users have no global scope — scope to the current company explicitly.
         $users = User::where('company_id', $request->user()->company_id)
-            ->orderByRaw("FIELD(role, 'owner', 'admin', 'manager', 'engineer', 'supervisor', 'accountant', 'worker')")
+            ->with('role')
+            ->orderBy(
+                Role::query()->select('sort_order')->whereColumn('roles.id', 'users.role_id')
+            )
             ->orderBy('name')
             ->paginate(15);
 
@@ -43,13 +55,13 @@ class UserController extends Controller
 
         // company_id / role / status are guarded on the model, so assign them
         // explicitly from validated data + the current tenant.
-        $user = new User();
+        $user = new User;
         $user->company_id = $request->user()->company_id;
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->phone = $data['phone'] ?? null;
         $user->password = $data['password']; // hashed by the model cast
-        $user->role = $data['role'];
+        $user->assignRole($data['role']);
         $user->status = $data['status'];
         $user->email_verified_at = now();
         $user->save();
@@ -83,7 +95,7 @@ class UserController extends Controller
 
         // The owner's role/status are immutable through this form.
         if (! $user->isOwner()) {
-            $user->role = $data['role'];
+            $user->assignRole($data['role']);
             $user->status = $data['status'];
         }
 

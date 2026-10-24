@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
+use App\Models\User;
 use App\Support\Stories;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -60,7 +62,9 @@ class PageController extends Controller
     // -- Product ----------------------------------------------------------
     public function features(): View
     {
-        return view('public.features');
+        return view('public.features', [
+            'roles' => Role::query()->orderBy('sort_order')->get(),
+        ]);
     }
 
     public function pricing(): View
@@ -127,6 +131,17 @@ class PageController extends Controller
     public function help(): View
     {
         return view('public.help');
+    }
+
+    /** Getting-started guide: the roles a new team uses, and where each signs in. */
+    public function howItWorks(): View
+    {
+        return view('public.how-it-works', [
+            'roles' => Role::query()
+                ->where('slug', '!=', User::ROLE_ADMIN)
+                ->orderBy('sort_order')
+                ->get(),
+        ]);
     }
 
     // -- Legal ------------------------------------------------------------

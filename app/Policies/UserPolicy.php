@@ -39,7 +39,7 @@ class UserPolicy
         }
 
         // Only an owner may edit another owner or an admin.
-        if (($model->isOwner() || $model->role === User::ROLE_ADMIN) && ! $user->isOwner()) {
+        if (($model->isOwner() || $model->hasRole(User::ROLE_ADMIN)) && ! $user->isOwner()) {
             return false;
         }
 
@@ -59,7 +59,7 @@ class UserPolicy
 
         // Admins can delete non-admins; only the owner can delete an admin.
         return $user->isAdmin()
-            && ($user->isOwner() || $model->role !== User::ROLE_ADMIN);
+            && ($user->isOwner() || ! $model->hasRole(User::ROLE_ADMIN));
     }
 
     /** Tenant guard: both users must belong to the same company. */

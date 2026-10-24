@@ -113,6 +113,7 @@ class TaskController extends Controller
             'projects' => Project::orderBy('name')->get(),
             'assignees' => User::where('company_id', $request->user()->company_id)
                 ->where('status', 'active')
+                ->with('role')
                 ->orderBy('name')
                 ->get(),
             // Candidate dependencies: other tasks in the tenant (exclude self).

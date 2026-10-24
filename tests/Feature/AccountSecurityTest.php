@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Http\Controllers\ReportController;
 use App\Models\ApiToken;
 use App\Models\Project;
+use App\Models\Role;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -30,7 +31,8 @@ class AccountSecurityTest extends TestCase
         $this->getJson('/api/tasks/'.$foreign->id)->assertNotFound();
         $this->patchJson('/api/tasks/'.$foreign->id, ['progress' => 40])->assertNotFound();
 
-        $user->forceFill(['role' => User::ROLE_MANAGER])->save();
+        $user->forceFill(['role_id' => Role::idFor(User::ROLE_MANAGER)])->save();
+        $user->unsetRelation('role');
         $this->getJson('/api/tasks/'.$other->id)->assertOk();
         $this->patchJson('/api/tasks/'.$other->id, ['progress' => 40])->assertOk();
     }
@@ -98,7 +100,7 @@ class AccountSecurityTest extends TestCase
     {
         $method = new \ReflectionMethod(ReportController::class, 'streamCsv');
         $values = ['=1+1', '+SUM(A1)', '-1+2', '@SUM(A1)', '  =1+1', "\tvalue", "\rvalue", 'ordinary', -15.5, null];
-        $response = $method->invoke(new ReportController(), 'test.csv', ['Values'], [$values]);
+        $response = $method->invoke(new ReportController, 'test.csv', ['Values'], [$values]);
         ob_start();
         $response->sendContent();
         $csv = ob_get_clean();

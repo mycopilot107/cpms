@@ -287,6 +287,7 @@
                 <div>
                     <h3 class="font-display text-sm font-semibold text-slate-900">Resources</h3>
                     <ul class="mt-4 space-y-3 text-sm">
+                        <li><a href="{{ route('how-it-works') }}" class="text-slate-500 transition hover:text-slate-900">How It Works</a></li>
                         <li><a href="{{ route('blog') }}" class="text-slate-500 transition hover:text-slate-900">Blog</a></li>
                         <li><a href="{{ route('faq') }}" class="text-slate-500 transition hover:text-slate-900">FAQ</a></li>
                         <li><a href="{{ route('case-studies') }}" class="text-slate-500 transition hover:text-slate-900">Case Studies</a></li>

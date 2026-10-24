@@ -73,7 +73,7 @@
                 <div class="flex items-center gap-4">
                     <div class="hidden text-right sm:block">
                         <div class="text-sm font-medium text-white">{{ auth()->user()?->name }}</div>
-                        <div class="text-xs text-slate-400">{{ $company?->name }} · {{ ucfirst(auth()->user()?->role) }}</div>
+                        <div class="text-xs text-slate-400">{{ $company?->name }} · {{ auth()->user()?->role?->name }}</div>
                     </div>
                     <form method="POST" action="{{ route('logout') }}" class="hidden md:block">
                         @csrf
@@ -102,7 +102,7 @@
             </div>
             <div class="border-t border-slate-800 px-4 py-3">
                 <div class="text-sm font-medium text-white">{{ auth()->user()?->name }}</div>
-                <div class="text-xs text-slate-400">{{ $company?->name }} · {{ ucfirst(auth()->user()?->role) }}</div>
+                <div class="text-xs text-slate-400">{{ $company?->name }} · {{ auth()->user()?->role?->name }}</div>
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">
                     @csrf
                     <button type="submit" class="w-full rounded-md border border-slate-700 px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800">Log out</button>
