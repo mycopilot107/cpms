@@ -91,6 +91,32 @@ class Currency
         return static::config(static::chargeCode());
     }
 
+    /** Whether Razorpay can bill in this currency. */
+    public static function isChargeable(?string $code): bool
+    {
+        $code = strtoupper((string) $code);
+
+        return static::has($code) && ! empty(static::all()[$code]['charge']);
+    }
+
+    /**
+     * The currency to bill in: the first preferred code that is chargeable
+     * (e.g. the company's currency, then the visitor's display currency),
+     * else the default charge currency.
+     *
+     * @return array<string, mixed>
+     */
+    public static function chargeFor(?string ...$preferred): array
+    {
+        foreach ($preferred as $code) {
+            if (static::isChargeable($code)) {
+                return static::config($code);
+            }
+        }
+
+        return static::charge();
+    }
+
     /**
      * Resolve the active DISPLAY currency for a request, from the
      * `cpms_currency` cookie (validated), else the default. Returns the

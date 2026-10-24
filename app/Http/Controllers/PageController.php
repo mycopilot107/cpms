@@ -63,7 +63,10 @@ class PageController extends Controller
     public function features(): View
     {
         return view('public.features', [
-            'roles' => Role::query()->orderBy('sort_order')->get(),
+            'roles' => Role::query()
+                ->where('slug', '!=', User::ROLE_ADMIN)
+                ->orderBy('sort_order')
+                ->get(),
         ]);
     }
 

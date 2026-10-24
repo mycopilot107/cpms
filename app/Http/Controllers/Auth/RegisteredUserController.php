@@ -35,6 +35,8 @@ class RegisteredUserController extends Controller
                 'name' => $data['company_name'],
                 'email' => $data['email'],
                 'phone' => $data['phone'] ?? null,
+                'country' => $data['country'],
+                'currency' => $data['currency'],
                 'status' => Company::STATUS_ACTIVE,
                 'trial_started_at' => $now,
                 'trial_ends_at' => $trialEndsAt,

@@ -41,11 +41,10 @@ class SubscriptionController extends Controller
 
         $company = $request->user()->company;
 
-        // Display-currency reference (INR/USD). Payment is still CHARGED in the
-        // charge currency (INR) — these only drive the on-screen reference and
-        // the "billed in …" note, never the amount.
+        // The display currency only drives the on-screen reference; the
+        // charge currency (and its price) decides what is billed.
         $display = Currency::active($request);
-        $charge = Currency::charge();
+        $charge = $this->chargeCurrency($request);
 
         return view('subscription.plans', [
             'company' => $company,
@@ -54,7 +53,7 @@ class SubscriptionController extends Controller
             'billingPeriod' => Currency::billingPeriod(),
             'pricePerUser' => Currency::pricePerUser($charge),
             'minSeats' => (int) config('billing.min_seats'),
-            'currencySymbol' => config('billing.currency_symbol'),
+            'currencySymbol' => $charge['symbol'] ?? '',
             'usedSeats' => $company->usedSeats(),
             'activeSubscription' => $company->activeSubscription(),
             'gatewayReady' => $this->razorpay->configured(),
@@ -75,8 +74,8 @@ class SubscriptionController extends Controller
         $minSeats = (int) config('billing.min_seats');
 
         // Charge price is DB-first (editable plan) with config as fallback, and
-        // is always taken from the CHARGE currency — never the display currency.
-        $charge = Currency::charge();
+        // is always taken from a chargeable currency — never a display-only one.
+        $charge = $this->chargeCurrency($request);
         $currency = (string) ($charge['code'] ?? config('billing.currency', 'INR'));
         $pricePerUser = Currency::pricePerUser($charge);
 
@@ -160,10 +159,9 @@ class SubscriptionController extends Controller
         $payment->update(['razorpay_order_id' => $order['id']]);
 
         // Display-currency reference only. The amount CHARGED is $payment->amount
-        // (INR) / $order['amount'] (paise) — computed above and never derived
+        // / $order['amount'] (smallest unit) — computed above and never derived
         // from this. These feed the on-screen reference and "billed in …" note.
         $display = Currency::active($request);
-        $charge = Currency::charge();
         $displayPricePerUser = Currency::pricePerUser($display);
 
         return view('subscription.checkout', [
@@ -172,7 +170,7 @@ class SubscriptionController extends Controller
             'company' => $company,
             'user' => $request->user(),
             'razorpayKey' => $this->razorpay->keyId(),
-            'currencySymbol' => config('billing.currency_symbol'),
+            'currencySymbol' => $charge['symbol'] ?? '',
             'billingPeriod' => $billingPeriod,
             'displayCurrency' => $display,
             'chargeCurrency' => $charge,
@@ -249,6 +247,20 @@ class SubscriptionController extends Controller
         return redirect()
             ->route('dashboard')
             ->with('status', 'Payment successful — your subscription is now active. Thank you!');
+    }
+
+    /**
+     * Bill in the company's own currency when Razorpay can charge it, then the
+     * visitor's display currency, else INR.
+     *
+     * @return array<string, mixed>
+     */
+    private function chargeCurrency(Request $request): array
+    {
+        return Currency::chargeFor(
+            $request->user()->company?->currency,
+            Currency::active($request)['code'] ?? null,
+        );
     }
 
     /** Only owners and admins may manage billing. */

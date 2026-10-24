@@ -18,6 +18,12 @@
             ['Is there a minimum?', 'Subscriptions start at a minimum number of seats. You can add more seats at any time as your team grows.'],
             ['What happens when my trial ends?', 'Your data stays put. You choose a plan to keep working; nothing is deleted when a trial lapses.'],
         ]],
+        ['Using Best CPMS outside India', [
+            ['Can companies outside India use Best CPMS?', 'Yes. When you sign up you choose your country and the currency your project costs are recorded in — for example US dollars, pounds, euros, or UAE dirhams. Budgets, BOQ, expenses, payments, and reports then show that currency. Owners and admins can change it later under Company settings.'],
+            ['Which currency is the subscription billed in?', 'Prices can be shown in rupees or US dollars. Checkout runs through Razorpay and is billed in Indian rupees unless US-dollar billing is switched on for your account, in which case companies that use dollars are billed in dollars. Cards issued outside India can be used where Razorpay accepts them; your bank converts the rupee amount.'],
+            ['Can I record a VAT or other tax number?', 'Yes. Company settings has a Tax ID field for a GST, VAT, TRN, EIN, or similar registration number.'],
+            ['Which languages are supported?', 'The website and the app are in English today.'],
+        ]],
         ['Security & data', [
             ['Is my company\'s data separate from other companies?', 'Yes. Each company\'s data is fully isolated. A user in one company can never see or access another company\'s projects, costs, or people.'],
             ['Who in my team can see what?', 'Access is role-based. Owners and admins manage the account and billing; members see the projects and data their role allows.'],

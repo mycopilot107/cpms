@@ -43,6 +43,7 @@
 
             if ($user?->isAdmin()) {
                 $navItems[] = ['url' => route('users.index'), 'label' => 'Team', 'active' => request()->routeIs('users.*')];
+                $navItems[] = ['url' => route('company.settings'), 'label' => 'Company', 'active' => request()->routeIs('company.*')];
                 $navItems[] = ['url' => route('subscription.plans'), 'label' => 'Billing', 'active' => request()->routeIs('subscription.*')];
             }
 

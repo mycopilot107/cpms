@@ -52,7 +52,7 @@
             <div><dt class="text-xs text-slate-400">Email</dt><dd class="text-slate-800">{{ $company->email ?: '—' }}</dd></div>
             <div><dt class="text-xs text-slate-400">Phone</dt><dd class="text-slate-800">{{ $company->phone ?: '—' }}</dd></div>
             <div><dt class="text-xs text-slate-400">Location</dt><dd class="text-slate-800">{{ collect([$company->city, $company->state, $company->country])->filter()->join(', ') ?: '—' }}</dd></div>
-            <div><dt class="text-xs text-slate-400">GST</dt><dd class="text-slate-800">{{ $company->gst_number ?: '—' }}</dd></div>
+            <div><dt class="text-xs text-slate-400">Tax ID</dt><dd class="text-slate-800">{{ $company->gst_number ?: '—' }}</dd></div>
             <div><dt class="text-xs text-slate-400">Trial ends</dt><dd class="text-slate-800">{{ $company->trial_ends_at?->format('j M Y') ?? '—' }}</dd></div>
             <div><dt class="text-xs text-slate-400">Users</dt><dd class="text-slate-800">{{ $company->users->count() }}@if ($company->seatLimit() !== null) / {{ $company->seatLimit() }} seats @endif</dd></div>
         </dl>

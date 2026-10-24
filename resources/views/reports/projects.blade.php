@@ -38,7 +38,7 @@
                         <td class="px-5 py-3 text-sm text-slate-600">{{ optional($project->start_date)->format('d M Y') ?: '—' }} → {{ optional($project->end_date)->format('d M Y') ?: '—' }}</td>
                         <td class="px-5 py-3 text-right text-sm text-slate-600">@include('partials.money', ['value' => $project->budget, 'muted' => true])</td>
                         <td class="px-5 py-3 text-right text-sm text-rose-600">@include('partials.money', ['value' => $project->expense_total, 'muted' => true])</td>
-                        <td class="px-5 py-3 text-right text-sm font-medium {{ $variance === null ? 'text-slate-400' : ($variance < 0 ? 'text-rose-600' : 'text-emerald-600') }}">{{ $variance === null ? '—' : '₹' . number_format($variance, 2) }}</td>
+                        <td class="px-5 py-3 text-right text-sm font-medium {{ $variance === null ? 'text-slate-400' : ($variance < 0 ? 'text-rose-600' : 'text-emerald-600') }}">{{ $variance === null ? '—' : \App\Support\Money::format($variance) }}</td>
                         <td class="px-5 py-3 text-right text-sm text-slate-600">{{ $project->tasks_count }}</td>
                         <td class="px-5 py-3 text-right text-sm text-slate-600">{{ $pct }}%</td>
                     </tr>
@@ -64,7 +64,7 @@
                 <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     <div><dt class="text-xs text-slate-400">Budget</dt><dd>@include('partials.money', ['value' => $project->budget, 'muted' => true])</dd></div>
                     <div><dt class="text-xs text-slate-400">Expenses</dt><dd class="text-rose-600">@include('partials.money', ['value' => $project->expense_total, 'muted' => true])</dd></div>
-                    <div><dt class="text-xs text-slate-400">Variance</dt><dd class="{{ $variance === null ? 'text-slate-400' : ($variance < 0 ? 'text-rose-600' : 'text-emerald-600') }}">{{ $variance === null ? '—' : '₹' . number_format($variance, 2) }}</dd></div>
+                    <div><dt class="text-xs text-slate-400">Variance</dt><dd class="{{ $variance === null ? 'text-slate-400' : ($variance < 0 ? 'text-rose-600' : 'text-emerald-600') }}">{{ $variance === null ? '—' : \App\Support\Money::format($variance) }}</dd></div>
                     <div><dt class="text-xs text-slate-400">Progress</dt><dd>{{ $pct }}% · {{ $project->tasks_count }} tasks</dd></div>
                 </dl>
             </div>

@@ -91,7 +91,7 @@
                 'contactType' => 'customer support',
                 'email'       => config('seo.organization.email'),
                 'telephone'   => config('seo.organization.telephone'),
-                'areaServed'  => config('seo.organization.country', 'IN'),
+                'areaServed'  => config('seo.region', 'Worldwide'),
             ]) ?: null,
         ], fn ($v) => $v !== null && $v !== '' && $v !== []);
 

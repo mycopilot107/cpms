@@ -114,7 +114,7 @@
                         <div class="flex items-center justify-between gap-4 px-6 py-3 text-sm">
                             <div>
                                 <div class="font-medium text-slate-800">
-                                    {{ $currencySymbol }}{{ number_format($payment->amount) }}
+                                    {{ \App\Support\Currency::format($payment->amount, $payment->currency) }} {{ $payment->currency }}
                                     · {{ $payment->seats }} users · {{ $payment->months }} {{ $payment->months == 1 ? 'month' : 'months' }}
                                 </div>
                                 <div class="text-xs text-slate-400">
@@ -149,12 +149,14 @@
             var monthsEl = document.getElementById('months');
             var totalEl = document.getElementById('total-amount');
             var lineEl = document.getElementById('calc-line');
-            var fmt = new Intl.NumberFormat('en-IN');
+            var fmt;
+            try { fmt = new Intl.NumberFormat(@json($chargeCurrency['locale'] ?? 'en-IN')); }
+            catch (e) { fmt = { format: function (n) { return n; } }; }
             var symbol = @json($currencySymbol);
 
             // Display-currency reference (shown only when it isn't the charge
             // currency). This is a reference figure — the charged amount is the
-            // INR total above and is recomputed server-side at checkout.
+            // charge-currency total above and is recomputed server-side at checkout.
             var displayIsCharge  = @json($displayIsCharge);
             var dispPricePerUser = @json((int) $displayPricePerUser);
             var dispSymbol       = @json($displayCurrency['symbol'] ?? '');

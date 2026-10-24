@@ -29,7 +29,7 @@
                     <div><dt class="text-slate-400">Project code</dt><dd class="text-slate-800">{{ $project->project_code ?: '—' }}</dd></div>
                     <div><dt class="text-slate-400">Client</dt><dd class="text-slate-800">{{ $project->client_name ?: '—' }}</dd></div>
                     <div><dt class="text-slate-400">Client contact</dt><dd class="text-slate-800">{{ $project->client_contact ?: '—' }}</dd></div>
-                    <div><dt class="text-slate-400">Budget</dt><dd class="text-slate-800">{{ $project->budget !== null ? '₹'.number_format((float) $project->budget, 2) : '—' }}</dd></div>
+                    <div><dt class="text-slate-400">Budget</dt><dd class="text-slate-800">{{ $project->budget !== null ? \App\Support\Money::format($project->budget) : '—' }}</dd></div>
                     <div><dt class="text-slate-400">Start date</dt><dd class="text-slate-800">{{ $project->start_date?->format('d M Y') ?: '—' }}</dd></div>
                     <div><dt class="text-slate-400">Target end</dt><dd class="text-slate-800">{{ $project->end_date?->format('d M Y') ?: '—' }}</dd></div>
                     <div class="sm:col-span-2"><dt class="text-slate-400">Site address</dt><dd class="text-slate-800">{{ $project->site_address ?: '—' }}</dd></div>

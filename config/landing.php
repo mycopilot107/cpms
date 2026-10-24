@@ -64,6 +64,7 @@ return [
                 'The company record can store a GST number, the plan is priced per user in INR, and checkout charges Indian rupees through Razorpay. A new company starts on a :trialDays-day free trial, then licenses the seats it needs — minimum :minSeats users, from :symbol:fromMonth per month.',
             ],
             'service_type' => 'Construction project management software in India',
+            'area_served' => 'IN',
             'features_heading' => 'What Indian construction teams run in Best CPMS',
             'features' => [
                 ['title' => 'INR pricing and Razorpay checkout', 'body' => 'The paid plan is quoted and charged in Indian rupees. Owners and admins pick seats and a 1, 3, 6, or 12 month term, and the total is calculated on the server.', 'route' => 'pricing'],

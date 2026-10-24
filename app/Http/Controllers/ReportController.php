@@ -6,9 +6,10 @@ use App\Models\Expense;
 use App\Models\Project;
 use App\Models\ProjectPayment;
 use App\Models\Task;
+use App\Support\Money;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
 {
@@ -31,13 +32,15 @@ class ReportController extends Controller
         $projects = Project::query()
             ->withCount('tasks')
             ->withSum('expenses as expense_total', 'amount')
-             ->withAvg(['tasks as avg_progress' => fn ($q) => $q->where('status', '!=', Task::STATUS_CANCELLED)], 'progress')
+            ->withAvg(['tasks as avg_progress' => fn ($q) => $q->where('status', '!=', Task::STATUS_CANCELLED)], 'progress')
             ->orderBy('name')
             ->get();
 
         if ($request->query('export') === 'csv') {
+            $code = Money::code();
+
             return $this->streamCsv('project-report.csv',
-                ['Project', 'Code', 'Status', 'Start', 'End', 'Budget', 'Expenses', 'Variance', 'Tasks', 'Progress %'],
+                ['Project', 'Code', 'Status', 'Start', 'End', "Budget ({$code})", "Expenses ({$code})", "Variance ({$code})", 'Tasks', 'Progress %'],
                 $projects->map(function (Project $p) {
                     $variance = $p->budget !== null ? (float) $p->budget - (float) $p->expense_total : null;
 
@@ -145,7 +148,7 @@ class ReportController extends Controller
             $rows->push(['TOTAL', $byCategory->sum('entries'), $totalExpenses]);
 
             return $this->streamCsv('cost-report.csv',
-                ['Category', 'Entries', 'Amount'],
+                ['Category', 'Entries', 'Amount ('.Money::code().')'],
                 $rows
             );
         }
@@ -177,7 +180,7 @@ class ReportController extends Controller
                     ->whereNotNull('due_date')
                     ->whereDate('due_date', '<', now()),
             ])
-             ->withAvg(['tasks as avg_progress' => fn ($q) => $q->where('status', '!=', Task::STATUS_CANCELLED)], 'progress')
+            ->withAvg(['tasks as avg_progress' => fn ($q) => $q->where('status', '!=', Task::STATUS_CANCELLED)], 'progress')
             ->orderBy('name')
             ->get();
 

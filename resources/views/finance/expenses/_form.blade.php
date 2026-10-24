@@ -35,7 +35,7 @@
         </div>
 
         <div>
-            <label for="amount" class="block text-sm font-medium text-slate-700">Amount (₹) <span class="text-red-500">*</span></label>
+            <label for="amount" class="block text-sm font-medium text-slate-700">Amount ({{ \App\Support\Money::code() }}) <span class="text-red-500">*</span></label>
             <input id="amount" name="amount" type="number" step="0.01" min="0" required value="{{ old('amount', $expense->amount ?? '') }}"
                    class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
         </div>

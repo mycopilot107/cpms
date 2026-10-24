@@ -3,7 +3,9 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
+use App\Support\Money;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class RegisterRequest extends FormRequest
@@ -31,6 +33,8 @@ class RegisterRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class.',email'],
             'phone' => ['nullable', 'string', 'max:30'],
+            'country' => ['required', 'string', Rule::in(array_keys(Money::countries()))],
+            'currency' => ['required', 'string', Rule::in(array_keys(Money::currencies()))],
             'password' => ['required', 'confirmed', Password::defaults()],
         ];
     }

@@ -36,6 +36,7 @@ class Company extends Model
         'city',
         'state',
         'country',
+        'currency',
         'gst_number',
         'logo',
         'status',

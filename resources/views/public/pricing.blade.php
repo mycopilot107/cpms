@@ -20,12 +20,12 @@
     $seatOpts = config('billing.seat_options');
     $termOpts = config('billing.term_options');
 
-    // The currency payments are actually taken in (INR via Razorpay). When the
-    // visitor is viewing a display-only currency (e.g. USD), we show what they
-    // will be billed so there are no surprises at checkout.
-    $charge        = Currency::charge();
+    // The currency payments are taken in. When the visitor is viewing a
+    // display-only currency, we show what they will be billed so there are no
+    // surprises at checkout.
+    $charge        = Currency::chargeFor($activeCode);
     $chargePerUser = Currency::pricePerUser($charge);
-    $isDisplayOnly = Currency::isDisplayOnly($active);
+    $isDisplayOnly = ! Currency::isChargeable($activeCode);
 
     // Other configured currencies (shown as an "or … " reference line).
     $others = collect($all)->reject(fn ($c, $code) => $code === $activeCode);

@@ -33,9 +33,9 @@ return [
         'construction project management software, construction project management system, construction management software, construction scheduling software, BOQ software, construction cost control, site progress tracking, project management for construction companies'
     ),
 
-    // Primary market emphasis — used in copy and structured data region hints.
-    // Kept broad ("IN" lead, global-friendly wording) per the build brief.
-    'region' => env('SEO_REGION', 'IN'),
+    // schema.org areaServed for the product. The company is based in India
+    // (organization.country below) but sells to customers anywhere.
+    'region' => env('SEO_REGION', 'Worldwide'),
 
     // Open Graph / Twitter share image (1200x630). Served from /public.
     'og_image' => env('SEO_OG_IMAGE', '/og-image.png'),
@@ -51,13 +51,13 @@ return [
     | address are optional; fill them in via .env for richer local SEO.
     */
     'organization' => [
-        'legal_name'   => env('SEO_ORG_LEGAL_NAME', 'Best CPMS'),
-        'logo'         => env('SEO_ORG_LOGO', '/favicon.svg'),
-        'email'        => env('SEO_ORG_EMAIL'),
-        'telephone'    => env('SEO_ORG_PHONE'),
-        'country'      => env('SEO_ORG_COUNTRY', 'IN'),
-        'locality'     => env('SEO_ORG_LOCALITY'),
-        'region'       => env('SEO_ORG_REGION'),
+        'legal_name' => env('SEO_ORG_LEGAL_NAME', 'Best CPMS'),
+        'logo' => env('SEO_ORG_LOGO', '/favicon.svg'),
+        'email' => env('SEO_ORG_EMAIL'),
+        'telephone' => env('SEO_ORG_PHONE'),
+        'country' => env('SEO_ORG_COUNTRY', 'IN'),
+        'locality' => env('SEO_ORG_LOCALITY'),
+        'region' => env('SEO_ORG_REGION'),
     ],
 
     /*

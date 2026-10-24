@@ -83,7 +83,7 @@
 
                     <div class="mt-5 grid grid-cols-3 gap-3 border-t border-slate-100 pt-4 text-center">
                         <div><p class="font-display text-xl font-bold text-slate-900">62%</p><p class="text-xs text-slate-500">Complete</p></div>
-                        <div><p class="font-display text-xl font-bold text-slate-900">₹4.2Cr</p><p class="text-xs text-slate-500">Committed</p></div>
+                        <div><p class="font-display text-xl font-bold text-slate-900">{{ ($currency['code'] ?? 'INR') === 'INR' ? '₹4.2Cr' : ($currency['symbol'] ?? '$').'510K' }}</p><p class="text-xs text-slate-500">Committed</p></div>
                         <div><p class="font-display text-xl font-bold text-slate-900">3</p><p class="text-xs text-slate-500">Open risks</p></div>
                     </div>
                 </div>

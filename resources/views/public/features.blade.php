@@ -66,7 +66,7 @@
                     @foreach ([
                         ['Project & task reports', 'Filterable status across projects, exportable to CSV.'],
                         ['Cost & progress reports', 'Budget burn and completion, ready for the client meeting.'],
-                        ['Role-based access', 'Seven roles, listed below. Each person opens only the screens that role allows.'],
+                        ['Role-based access', 'Each role is listed below. Each person opens only the screens that role allows.'],
                         ['Multi-company isolation', 'Each company\'s data is fully separated — never shared or visible across tenants.'],
                     ] as $f)
                         <div class="border-l-2 border-slate-200 pl-4">

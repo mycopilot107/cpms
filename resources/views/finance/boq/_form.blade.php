@@ -55,14 +55,14 @@
         </div>
 
         <div>
-            <label for="rate" class="block text-sm font-medium text-slate-700">Rate (₹) <span class="text-red-500">*</span></label>
+            <label for="rate" class="block text-sm font-medium text-slate-700">Rate ({{ \App\Support\Money::code() }}) <span class="text-red-500">*</span></label>
             <input id="rate" name="rate" type="number" step="0.01" min="0" required value="{{ old('rate', $item->rate ?? '') }}"
                    class="boq-calc mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
         </div>
 
         <div>
             <label class="block text-sm font-medium text-slate-700">Amount</label>
-            <div id="boq-amount" class="mt-1 block w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-slate-700">₹0.00</div>
+            <div id="boq-amount" class="mt-1 block w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-slate-700">{{ \App\Support\Money::format(0) }}</div>
             <p class="mt-1 text-xs text-slate-400">Quantity × rate, computed on save.</p>
         </div>
     </div>
@@ -80,10 +80,15 @@
         var q = document.getElementById('quantity');
         var r = document.getElementById('rate');
         var out = document.getElementById('boq-amount');
+        var symbol = @json(\App\Support\Money::symbol());
+        var locale = @json(\App\Support\Money::locale());
         if (!q || !r || !out) return;
         function recalc() {
             var amt = (parseFloat(q.value) || 0) * (parseFloat(r.value) || 0);
-            out.textContent = '₹' + amt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            var text;
+            try { text = amt.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+            catch (e) { text = amt.toFixed(2); }
+            out.textContent = symbol + text;
         }
         q.addEventListener('input', recalc);
         r.addEventListener('input', recalc);

@@ -6,7 +6,7 @@ use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Company>
+ * @extends Factory<Company>
  */
 class CompanyFactory extends Factory
 {
@@ -25,12 +25,22 @@ class CompanyFactory extends Factory
             'city' => fake()->city(),
             'state' => fake()->state(),
             'country' => 'India',
+            'currency' => 'INR',
             'gst_number' => strtoupper(fake()->bothify('##???####?#?#')),
             'logo' => null,
             'status' => Company::STATUS_ACTIVE,
             'trial_started_at' => now(),
             'trial_ends_at' => now()->copy()->addDays(Company::TRIAL_DAYS),
         ];
+    }
+
+    /** A company outside India that records costs in another currency. */
+    public function inCountry(string $country, string $currency): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'country' => $country,
+            'currency' => $currency,
+        ]);
     }
 
     /** A company whose trial has already lapsed. */

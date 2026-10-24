@@ -64,7 +64,7 @@
     'url' => route('landing.'.$key),
     'description' => $page['meta_description'],
     'provider' => ['@type' => 'Organization', 'name' => config('seo.site_name', 'Best CPMS'), 'url' => url('/')],
-    'areaServed' => config('seo.region', 'IN'),
+    'areaServed' => $page['area_served'] ?? config('seo.region', 'Worldwide'),
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 <script type="application/ld+json">{!! json_encode([
     '@context' => 'https://schema.org',

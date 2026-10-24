@@ -3,21 +3,11 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class PriorityKeywordPagesTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Routes live at the root of public/. APP_URL includes the /cpms alias
-        // Apache strips before PHP sees the path, so test requests must too.
-        URL::forceRootUrl('http://localhost');
-    }
 
     public function test_priority_keyword_pages_are_indexable(): void
     {

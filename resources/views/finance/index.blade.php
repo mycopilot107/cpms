@@ -61,7 +61,7 @@
                         <td class="px-5 py-3 text-right text-sm text-slate-600">@include('partials.money', ['value' => $project->boq_total, 'muted' => true])</td>
                         <td class="px-5 py-3 text-right text-sm text-rose-600">@include('partials.money', ['value' => $project->expense_total, 'muted' => true])</td>
                         <td class="px-5 py-3 text-right text-sm font-medium {{ $variance === null ? 'text-slate-400' : ($variance < 0 ? 'text-rose-600' : 'text-emerald-600') }}">
-                            {{ $variance === null ? '—' : '₹' . number_format($variance, 2) }}
+                            {{ $variance === null ? '—' : \App\Support\Money::format($variance) }}
                         </td>
                         <td class="px-5 py-3 text-right text-sm text-emerald-600">@include('partials.money', ['value' => $project->received_total, 'muted' => true])</td>
                         <td class="px-5 py-3 text-right text-sm text-amber-600">@include('partials.money', ['value' => $project->paid_total, 'muted' => true])</td>
@@ -87,7 +87,7 @@
                     <div><dt class="text-xs text-slate-400">Budget</dt><dd>@include('partials.money', ['value' => $project->budget, 'muted' => true])</dd></div>
                     <div><dt class="text-xs text-slate-400">BOQ</dt><dd>@include('partials.money', ['value' => $project->boq_total, 'muted' => true])</dd></div>
                     <div><dt class="text-xs text-slate-400">Expenses</dt><dd class="text-rose-600">@include('partials.money', ['value' => $project->expense_total, 'muted' => true])</dd></div>
-                    <div><dt class="text-xs text-slate-400">Variance</dt><dd class="font-medium {{ $variance === null ? 'text-slate-400' : ($variance < 0 ? 'text-rose-600' : 'text-emerald-600') }}">{{ $variance === null ? '—' : '₹' . number_format($variance, 2) }}</dd></div>
+                    <div><dt class="text-xs text-slate-400">Variance</dt><dd class="font-medium {{ $variance === null ? 'text-slate-400' : ($variance < 0 ? 'text-rose-600' : 'text-emerald-600') }}">{{ $variance === null ? '—' : \App\Support\Money::format($variance) }}</dd></div>
                     <div><dt class="text-xs text-slate-400">Received</dt><dd class="text-emerald-600">@include('partials.money', ['value' => $project->received_total, 'muted' => true])</dd></div>
                     <div><dt class="text-xs text-slate-400">Paid</dt><dd class="text-amber-600">@include('partials.money', ['value' => $project->paid_total, 'muted' => true])</dd></div>
                 </dl>

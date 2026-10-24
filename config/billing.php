@@ -70,8 +70,10 @@ return [
     | `cpms_currency` cookie (App\Support\Currency), with `default_currency`
     | as the fallback. `price_per_user` here is the SET price advertised in
     | that currency (not an FX conversion) and SEEDS the editable `plan_prices`
-    | row for that currency. Exactly one currency should be flagged
-    | `charge => true` — that is what payments are actually billed in.
+    | row for that currency. Currencies flagged `charge => true` can be billed
+    | through Razorpay. INR is always chargeable; when more than one is, the
+    | company's own currency (or the visitor's display currency) is used if it
+    | is chargeable, otherwise INR.
     */
     'default_currency' => env('BILLING_DEFAULT_CURRENCY', 'INR'),
 
@@ -90,7 +92,10 @@ return [
             'label' => 'US Dollar',
             'locale' => 'en-US',
             'price_per_user' => 12,
-            'charge' => false,  // display-only for now (billed in INR)
+            // Charge USD only after Razorpay has enabled international payments
+            // in USD on the account. Until then USD is a display reference and
+            // foreign customers are billed in INR.
+            'charge' => (bool) env('BILLING_CHARGE_USD', false),
         ],
     ],
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\BoqItemController;
+use App\Http\Controllers\CompanySettingsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\DashboardController;
@@ -157,6 +158,11 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     Route::view('subscription/expired', 'subscription.expired')->name('subscription.expired');
+
+    // Company profile (country, currency, tax ID). Owners/admins only, checked
+    // in the controller and form request.
+    Route::get('company/settings', [CompanySettingsController::class, 'edit'])->name('company.settings');
+    Route::put('company/settings', [CompanySettingsController::class, 'update'])->name('company.settings.update');
 
     /*
      | Billing / checkout. These MUST stay outside the "subscription" gate:

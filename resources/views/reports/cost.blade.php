@@ -51,18 +51,18 @@
         <div class="rounded-xl border border-slate-200 bg-white p-4">
             <div class="text-xs font-medium uppercase tracking-wide text-slate-400">Budget variance</div>
             <div class="mt-1 text-lg font-semibold {{ $variance === null ? 'text-slate-400' : ($variance < 0 ? 'text-rose-600' : 'text-emerald-600') }}">
-                {{ $variance === null ? '—' : '₹' . number_format($variance, 2) }}
+                {{ $variance === null ? '—' : \App\Support\Money::format($variance) }}
             </div>
             <p class="mt-1 text-xs text-slate-400">Budget minus expenses.</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white p-4">
             <div class="text-xs font-medium uppercase tracking-wide text-slate-400">Net cash flow</div>
-            <div class="mt-1 text-lg font-semibold {{ $net < 0 ? 'text-rose-600' : 'text-emerald-600' }}">₹{{ number_format($net, 2) }}</div>
+            <div class="mt-1 text-lg font-semibold {{ $net < 0 ? 'text-rose-600' : 'text-emerald-600' }}">{{ \App\Support\Money::format($net) }}</div>
             <p class="mt-1 text-xs text-slate-400">Received minus paid.</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white p-4">
             <div class="text-xs font-medium uppercase tracking-wide text-slate-400">Expenses vs received</div>
-            <div class="mt-1 text-lg font-semibold {{ ($received - $totalExpenses) < 0 ? 'text-rose-600' : 'text-emerald-600' }}">₹{{ number_format($received - $totalExpenses, 2) }}</div>
+            <div class="mt-1 text-lg font-semibold {{ ($received - $totalExpenses) < 0 ? 'text-rose-600' : 'text-emerald-600' }}">{{ \App\Support\Money::format($received - $totalExpenses) }}</div>
             <p class="mt-1 text-xs text-slate-400">Cash in minus cost incurred.</p>
         </div>
     </div>

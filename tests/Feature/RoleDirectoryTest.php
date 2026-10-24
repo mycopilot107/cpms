@@ -5,21 +5,11 @@ namespace Tests\Feature;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class RoleDirectoryTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Routes live at the root of public/. APP_URL includes the /cpms alias
-        // Apache strips before PHP sees the path, so test requests must too.
-        URL::forceRootUrl('http://localhost');
-    }
 
     public function test_features_page_lists_every_role(): void
     {
@@ -29,7 +19,8 @@ class RoleDirectoryTest extends TestCase
             ->assertSee('Owner')
             ->assertSee('Project manager')
             ->assertSee('Site worker')
-            ->assertSee('Registers the company and holds the account.', false);
+            ->assertSee('Registers the company and holds the account.', false)
+            ->assertDontSee('Runs the company day to day', false);
     }
 
     public function test_how_it_works_page_explains_roles_without_admin(): void
