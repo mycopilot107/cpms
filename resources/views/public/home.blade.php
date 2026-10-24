@@ -94,7 +94,7 @@
     {{-- ============================ Trusted-by strip ============================ --}}
     <section class="border-b border-slate-200 bg-white">
         <div class="mx-auto max-w-6xl px-5 py-8 lg:px-8">
-            <p class="text-center text-sm text-slate-500">Trusted by contractors, developers, and PMCs managing <span class="font-semibold text-slate-700">2,400+ active projects</span></p>
+            <p class="text-center text-sm text-slate-500">Trusted by contractors, developers, and PMCs managing <span class="font-semibold text-slate-700">5+ active projects</span></p>
         </div>
     </section>
 

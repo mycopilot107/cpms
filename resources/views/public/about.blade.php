@@ -21,8 +21,8 @@
 
             <dl class="mt-14 grid grid-cols-2 gap-8 border-t border-slate-200 pt-10 sm:grid-cols-4">
                 @foreach ([
-                    ['2,400+', 'Active projects'],
-                    ['18', 'Countries'],
+                    ['5+', 'Active projects'],
+                    ['2', 'Countries'],
                     ['99.9%', 'Uptime target'],
                     ['4.8/5', 'Avg. review'],
                 ] as $stat)
