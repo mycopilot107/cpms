@@ -33,6 +33,8 @@ class SitemapController extends Controller
             ['route' => 'landing.budget',           'priority' => '0.9', 'freq' => 'weekly'],
             ['route' => 'landing.expenses',         'priority' => '0.9', 'freq' => 'weekly'],
             ['route' => 'landing.reporting',        'priority' => '0.9', 'freq' => 'weekly'],
+            ['route' => 'landing.management',       'priority' => '0.9', 'freq' => 'weekly'],
+            ['route' => 'landing.scheduling',       'priority' => '0.9', 'freq' => 'weekly'],
             ['route' => 'features',          'priority' => '0.8', 'freq' => 'monthly'],
             ['route' => 'pricing',           'priority' => '0.8', 'freq' => 'monthly'],
             ['route' => 'services.planning', 'priority' => '0.7', 'freq' => 'monthly'],

@@ -172,6 +172,8 @@
             <p class="mt-4 max-w-2xl text-lg text-slate-600">Pages for the searches construction teams actually make, each tied to a part of the product.</p>
             <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ([
+                    ['landing.management', 'Construction management software', 'Run several sites from one company account, with roles for office and field.'],
+                    ['landing.scheduling', 'Construction scheduling software', 'Milestones, dated tasks, a month calendar, and a Gantt from those dates.'],
                     ['landing.india', 'Construction project management software India', 'Plan, cost, and report jobs with INR pricing and Razorpay checkout.'],
                     ['landing.project-tracking', 'Construction project tracking software', 'Follow schedule, cost, and site progress on one project picture.'],
                     ['landing.budget', 'Construction budget management software', 'Hold the project budget against the BOQ, expenses, and payments.'],

@@ -3,15 +3,27 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class PriorityKeywordPagesTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Routes live at the root of public/. APP_URL includes the /cpms alias
+        // Apache strips before PHP sees the path, so test requests must too.
+        URL::forceRootUrl('http://localhost');
+    }
+
     public function test_priority_keyword_pages_are_indexable(): void
     {
         $pages = [
+            '/construction-management-software' => 'Construction management software',
+            '/construction-scheduling-software' => 'Construction scheduling software',
             '/construction-project-management-software-india' => 'Construction project management software India',
             '/construction-project-tracking-software' => 'Construction project tracking software',
             '/construction-budget-management-software' => 'Construction budget management software',
@@ -34,6 +46,8 @@ class PriorityKeywordPagesTest extends TestCase
 
         $this->get('/sitemap.xml')
             ->assertOk()
+            ->assertSee('construction-management-software', false)
+            ->assertSee('construction-scheduling-software', false)
             ->assertSee('construction-project-management-software-india', false)
             ->assertSee('construction-budget-management-software', false)
             ->assertSee('construction-expense-tracking-software', false)

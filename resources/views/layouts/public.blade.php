@@ -263,6 +263,7 @@
                         <li><a href="{{ route('landing.budget') }}" class="text-slate-500 transition hover:text-slate-900">Budget Management</a></li>
                         <li><a href="{{ route('landing.expenses') }}" class="text-slate-500 transition hover:text-slate-900">Expense Tracking</a></li>
                         <li><a href="{{ route('landing.reporting') }}" class="text-slate-500 transition hover:text-slate-900">Project Reporting</a></li>
+                        <li><a href="{{ route('landing.management') }}" class="text-slate-500 transition hover:text-slate-900">Construction Management</a></li>
                     </ul>
                 </div>
 
@@ -271,6 +272,7 @@
                     <h3 class="font-display text-sm font-semibold text-slate-900">Services</h3>
                     <ul class="mt-4 space-y-3 text-sm">
                         <li><a href="{{ route('cpm-software') }}" class="text-slate-500 transition hover:text-slate-900">Construction PM Software</a></li>
+                        <li><a href="{{ route('landing.scheduling') }}" class="text-slate-500 transition hover:text-slate-900">Scheduling Software</a></li>
                         <li><a href="{{ route('services.planning') }}" class="text-slate-500 transition hover:text-slate-900">Planning &amp; Scheduling</a></li>
                         <li><a href="{{ route('services.cost') }}" class="text-slate-500 transition hover:text-slate-900">Cost &amp; Budget Control</a></li>
                         <li><a href="{{ route('services.field') }}" class="text-slate-500 transition hover:text-slate-900">Field &amp; Progress Tracking</a></li>

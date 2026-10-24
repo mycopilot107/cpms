@@ -1,17 +1,17 @@
 @extends('layouts.public')
 
-@section('title', 'Construction Scheduling Software')
-@section('meta_description', 'Construction scheduling software to sequence the whole build — milestones, tasks, dependencies, a shared calendar and a Gantt timeline that shows slippage before it spreads.')
+@section('title', 'Planning and Scheduling')
+@section('meta_description', 'Plan a construction programme with milestones, dated tasks, one predecessor per task, a shared calendar, and a Gantt timeline. Late work stays visible until the date or the status changes.')
 @section('meta_keywords', 'construction scheduling software, construction planning software, gantt chart software for construction, construction project scheduling, cpm scheduling software')
 
 @push('ld')
 <script type="application/ld+json">{!! json_encode([
     '@context' => 'https://schema.org',
     '@type' => 'Service',
-    'serviceType' => 'Construction scheduling software',
-    'name' => 'Planning & scheduling — Best CPMS',
+    'serviceType' => 'Construction planning and scheduling',
+    'name' => 'Planning and scheduling — Best CPMS',
     'url' => route('services.planning'),
-    'description' => 'Construction scheduling software: milestones, tasks, dependencies, a shared calendar and a Gantt timeline for the whole build.',
+    'description' => 'Milestones, dated tasks, a shared calendar, and a Gantt timeline for the construction programme.',
     'provider' => ['@type' => 'Organization', 'name' => config('seo.site_name', 'Best CPMS'), 'url' => url('/')],
     'areaServed' => config('seo.region', 'IN'),
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
@@ -20,7 +20,7 @@
     '@type' => 'BreadcrumbList',
     'itemListElement' => [
         ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
-        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Construction Scheduling Software', 'item' => route('services.planning')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Planning and scheduling', 'item' => route('services.planning')],
     ],
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
@@ -36,7 +36,7 @@
     <section class="bg-white">
         <div class="mx-auto max-w-4xl px-5 py-16 sm:py-20 lg:px-8">
             <div class="space-y-5 text-lg leading-relaxed text-slate-700">
-                <p>A plan is only useful if it stays true. Best CPMS keeps your programme connected to the work itself — so when a task slips, everything downstream reflects it, and the people who need to know, know.</p>
+                <p>A plan is only useful if it stays true. Best CPMS keeps your programme connected to the work itself — so when a task slips, everything downstream reflects it, and the people who need to know, know. The product page for this is <a href="{{ route('landing.scheduling') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">construction scheduling software</a>.</p>
             </div>
 
             <div class="mt-12 grid gap-6 sm:grid-cols-2">
