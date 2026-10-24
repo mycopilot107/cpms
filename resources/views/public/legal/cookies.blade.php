@@ -51,7 +51,7 @@
 
                 <div>
                     <h2>Contact</h2>
-                    <p>Questions about our use of cookies? Email <a href="mailto:abc@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">abc@gmail.com</a> or see our <a href="{{ route('privacy') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">Privacy Policy</a>.</p>
+                    <p>Questions about our use of cookies? Email <a href="mailto:shobha.solanki107@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">shobha.solanki107@gmail.com</a> or see our <a href="{{ route('privacy') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">Privacy Policy</a>.</p>
                 </div>
 
                 <p class="border-t border-slate-200 pt-6 text-sm text-slate-400">This policy is provided as a general template and should be reviewed by legal counsel before you rely on it.</p>

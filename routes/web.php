@@ -97,7 +97,7 @@ Route::get('terms-and-conditions', [PageController::class, 'terms'])->name('term
 Route::get('refund-policy', [PageController::class, 'refund'])->name('refund');
 Route::get('cookie-policy', [PageController::class, 'cookies'])->name('cookies');
 
-// Contact + customer feedback (persist to DB, email abc@gmail.com).
+// Contact + customer feedback (persist to DB, email shobha.solanki107@gmail.com).
 // Throttled to blunt spam/abuse of the public POST endpoints.
 Route::get('contact', [ContactController::class, 'contact'])->name('contact');
 Route::post('contact', [ContactController::class, 'storeContact'])

@@ -83,7 +83,7 @@ One table serves both forms, distinguished by a `type` enum.
   then emails it. The DB write is authoritative; mail is wrapped in try/catch and
   logged on failure, so a missing/broken SMTP config never breaks the form.
 - **Mail:** `App\Mail\ContactMessageReceived` → `resources/views/emails/contact-message.blade.php`.
-  Sent to `config('mail.contact_to')`, which defaults to **abc@gmail.com**
+  Sent to `config('mail.contact_to')`, which defaults to **shobha.solanki107@gmail.com**
   (override via `CONTACT_TO` in `.env`). `replyTo` is set to the submitter.
 - **Dev note:** `MAIL_MAILER` defaults to `log`, so in local dev the notification
   is written to the Laravel log rather than actually sent.

@@ -91,7 +91,7 @@
                         <dl class="mt-5 space-y-5 text-sm">
                             <div>
                                 <dt class="font-medium text-slate-500">Email</dt>
-                                <dd class="mt-1"><a href="mailto:abc@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">abc@gmail.com</a></dd>
+                                <dd class="mt-1"><a href="mailto:shobha.solanki107@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">shobha.solanki107@gmail.com</a></dd>
                             </div>
                             <div>
                                 <dt class="font-medium text-slate-500">Support</dt>

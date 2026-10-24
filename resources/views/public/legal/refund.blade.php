@@ -48,7 +48,7 @@
 
                 <div>
                     <h2>How to request a refund</h2>
-                    <p>To request a refund or ask about cancellation, email <a href="mailto:abc@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">abc@gmail.com</a> with your account details. We aim to respond within one business day.</p>
+                    <p>To request a refund or ask about cancellation, email <a href="mailto:shobha.solanki107@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">shobha.solanki107@gmail.com</a> with your account details. We aim to respond within one business day.</p>
                 </div>
 
                 <div>

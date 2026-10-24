@@ -68,7 +68,7 @@
 
                 <div>
                     <h2>Contact</h2>
-                    <p>Questions about these Terms? Email <a href="mailto:abc@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">abc@gmail.com</a> or use our <a href="{{ route('contact') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">contact page</a>.</p>
+                    <p>Questions about these Terms? Email <a href="mailto:shobha.solanki107@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">shobha.solanki107@gmail.com</a> or use our <a href="{{ route('contact') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">contact page</a>.</p>
                 </div>
 
                 <p class="border-t border-slate-200 pt-6 text-sm text-slate-400">These terms are provided as a general template and should be reviewed by legal counsel before you rely on them.</p>

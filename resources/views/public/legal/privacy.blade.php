@@ -68,7 +68,7 @@
 
                 <div>
                     <h2>Contact</h2>
-                    <p>Questions about this policy? Email us at <a href="mailto:abc@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">abc@gmail.com</a> or via our <a href="{{ route('contact') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">contact page</a>.</p>
+                    <p>Questions about this policy? Email us at <a href="mailto:shobha.solanki107@gmail.com" class="font-semibold text-indigo-600 hover:text-indigo-700">shobha.solanki107@gmail.com</a> or via our <a href="{{ route('contact') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">contact page</a>.</p>
                 </div>
 
                 <p class="border-t border-slate-200 pt-6 text-sm text-slate-400">This policy is provided as a general template and should be reviewed by legal counsel before you rely on it.</p>

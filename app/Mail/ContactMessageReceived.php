@@ -13,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 /**
  * Notification sent to the Best CPMS inbox when a visitor submits the public
  * Contact or Feedback form. Recipient is configurable via config('mail.contact_to')
- * (defaults to abc@gmail.com). Reply-To is set to the visitor so a reply goes
+ * (defaults to shobha.solanki107@gmail.com). Reply-To is set to the visitor so a reply goes
  * straight back to them.
  */
 class ContactMessageReceived extends Mailable

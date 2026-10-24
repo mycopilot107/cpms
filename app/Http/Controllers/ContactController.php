@@ -22,7 +22,7 @@ class ContactController extends Controller
         ]);
 
         try {
-            Mail::to(config('mail.contact_to', 'abc@gmail.com'))
+            Mail::to(config('mail.contact_to', 'shobha.solanki107@gmail.com'))
                 ->send(new ContactMessageReceived($message));
         } catch (\Throwable $e) {
             // Saved to the database regardless; surface the mail issue in logs.
