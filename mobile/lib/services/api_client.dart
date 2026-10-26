@@ -47,43 +47,17 @@ class ApiClient {
   /// Called whenever the server returns 401 so the app can drop the session.
   void Function()? onUnauthorized;
 
-  static const _baseUrlKey = 'api_base_url';
+  /// A server address saved by an earlier build that let users change it.
+  static const _legacyBaseUrlKey = 'api_base_url';
 
   String? _token;
   set token(String? value) => _token = value;
 
-  /// The server this app talks to. Starts as the build default and can be
-  /// changed from the sign-in screen.
-  String baseUrl = AppConfig.apiBaseUrl;
-
-  /// Host shown in messages, e.g. "example.com".
-  String get serverHost => Uri.tryParse(baseUrl)?.host ?? baseUrl;
-
-  /// Use the server address saved on this phone, if any.
-  Future<void> loadSavedBaseUrl() async {
+  /// Drop any server address an older build saved, so every install uses
+  /// [AppConfig.apiBaseUrl].
+  Future<void> clearLegacyBaseUrl() async {
     final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString(_baseUrlKey);
-    if (saved != null && saved.isNotEmpty) baseUrl = saved;
-  }
-
-  /// Save a new server address (normalised to end in /api).
-  Future<void> saveBaseUrl(String input) async {
-    baseUrl = AppConfig.normalizeBaseUrl(input);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_baseUrlKey, baseUrl);
-  }
-
-  /// Whether the server answers at all. Any HTTP reply counts — GET /login
-  /// returns 405, which still proves the address is right.
-  Future<bool> ping() async {
-    try {
-      await _http
-          .get(Uri.parse('$baseUrl/login'), headers: {'Accept': 'application/json'})
-          .timeout(const Duration(seconds: 10));
-      return true;
-    } catch (_) {
-      return false;
-    }
+    await prefs.remove(_legacyBaseUrlKey);
   }
 
   Future<dynamic> get(String path, {Map<String, String>? query}) {
@@ -104,7 +78,7 @@ class ApiClient {
     Object? body,
     Map<String, String>? query,
   }) async {
-    final uri = Uri.parse('$baseUrl$path').replace(
+    final uri = Uri.parse('${AppConfig.apiBaseUrl}$path').replace(
       queryParameters: query,
     );
 
@@ -125,24 +99,24 @@ class ApiClient {
     } on TimeoutException {
       throw ApiException(
         0,
-        '$serverHost did not answer in time. If you are on mobile data, the '
-        'server address must be a public address — tap "Server address" below.',
+        'The server took too long to respond. Check your internet connection '
+        'and try again.',
       );
     } on SocketException {
       throw ApiException(
         0,
-        'Cannot reach $serverHost. Check your internet connection, or tap '
-        '"Server address" below to change it.',
-      );
-    } on http.ClientException {
-      throw ApiException(
-        0,
-        'Cannot connect to $serverHost. Check the server address below.',
+        'No internet connection. Check Wi-Fi or mobile data and try again.',
       );
     } on HandshakeException {
       throw ApiException(
         0,
-        'Secure connection to $serverHost failed. Check the server address below.',
+        'A secure connection could not be made. Check the phone\'s date and '
+        'time, then try again.',
+      );
+    } on http.ClientException {
+      throw ApiException(
+        0,
+        'Could not connect to Best CPMS. Please try again.',
       );
     }
 

@@ -10,10 +10,8 @@
 #   ./build_apk.sh https://app.yourcompany.com/api
 #   API_BASE_URL=https://app.yourcompany.com/api ./build_apk.sh
 #
-# If no API base URL is given, the app falls back to its compiled-in default
-# (http://10.0.2.2:8000/api), which ONLY works on an Android emulator — not on
-# a real phone. For a build you hand to field staff, always pass the real URL.
-# See ../docs/MOBILE-BUILD.md for the HTTPS / cleartext-HTTP caveat.
+# If no API base URL is given, the app uses its built-in default,
+# https://bestcpms.com/api. Pass a URL only to build for another server.
 
 set -euo pipefail
 
@@ -49,9 +47,7 @@ if [ -n "$API_BASE_URL" ]; then
   echo "    API base URL: $API_BASE_URL"
   flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL"
 else
-  echo "WARNING: no API_BASE_URL given — the app will use its built-in default" >&2
-  echo "         http://10.0.2.2:8000/api, which only works on an Android emulator." >&2
-  echo "         Re-run with the real URL, e.g.: ./build_apk.sh https://app.example.com/api" >&2
+  echo "    API base URL: https://bestcpms.com/api (built-in default)"
   flutter build apk --release
 fi
 

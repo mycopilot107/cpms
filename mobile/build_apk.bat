@@ -5,10 +5,8 @@ REM
 REM Usage:   build_apk.bat [API_BASE_URL]
 REM Example: build_apk.bat https://app.yourcompany.com/api
 REM
-REM With no API_BASE_URL the app uses its built-in default
-REM (http://10.0.2.2:8000/api), which only works on an Android emulator.
-REM For a build you hand to field staff, always pass the real URL.
-REM See ..\docs\MOBILE-BUILD.md for the HTTPS / cleartext-HTTP caveat.
+REM With no API_BASE_URL the app uses its built-in default,
+REM https://bestcpms.com/api. Pass a URL only to build for another server.
 
 setlocal
 cd /d "%~dp0"
@@ -36,9 +34,7 @@ call flutter pub get
 
 echo ==^> Building release APK
 if "%API_BASE_URL%"=="" (
-  echo WARNING: no API_BASE_URL given - the app will use its built-in default
-  echo          http://10.0.2.2:8000/api, which only works on an Android emulator.
-  echo          Re-run with the real URL, e.g.: build_apk.bat https://app.example.com/api
+  echo     API base URL: https://bestcpms.com/api ^(built-in default^)
   call flutter build apk --release
 ) else (
   echo     API base URL: %API_BASE_URL%

@@ -12,9 +12,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // One HTTP client, shared by the auth and task services so they use the
-  // same bearer token and server address.
+  // same bearer token.
   final api = ApiClient();
-  await api.loadSavedBaseUrl();
+  await api.clearLegacyBaseUrl();
   runApp(CpmsApp(api: api));
 }
 
