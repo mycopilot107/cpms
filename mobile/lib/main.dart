@@ -8,10 +8,13 @@ import 'services/auth_service.dart';
 import 'services/task_service.dart';
 import 'theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   // One HTTP client, shared by the auth and task services so they use the
-  // same bearer token.
+  // same bearer token and server address.
   final api = ApiClient();
+  await api.loadSavedBaseUrl();
   runApp(CpmsApp(api: api));
 }
 

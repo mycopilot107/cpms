@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config.dart';
 
@@ -46,8 +47,44 @@ class ApiClient {
   /// Called whenever the server returns 401 so the app can drop the session.
   void Function()? onUnauthorized;
 
+  static const _baseUrlKey = 'api_base_url';
+
   String? _token;
   set token(String? value) => _token = value;
+
+  /// The server this app talks to. Starts as the build default and can be
+  /// changed from the sign-in screen.
+  String baseUrl = AppConfig.apiBaseUrl;
+
+  /// Host shown in messages, e.g. "example.com".
+  String get serverHost => Uri.tryParse(baseUrl)?.host ?? baseUrl;
+
+  /// Use the server address saved on this phone, if any.
+  Future<void> loadSavedBaseUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_baseUrlKey);
+    if (saved != null && saved.isNotEmpty) baseUrl = saved;
+  }
+
+  /// Save a new server address (normalised to end in /api).
+  Future<void> saveBaseUrl(String input) async {
+    baseUrl = AppConfig.normalizeBaseUrl(input);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_baseUrlKey, baseUrl);
+  }
+
+  /// Whether the server answers at all. Any HTTP reply counts — GET /login
+  /// returns 405, which still proves the address is right.
+  Future<bool> ping() async {
+    try {
+      await _http
+          .get(Uri.parse('$baseUrl/login'), headers: {'Accept': 'application/json'})
+          .timeout(const Duration(seconds: 10));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 
   Future<dynamic> get(String path, {Map<String, String>? query}) {
     return _send('GET', path, query: query);
@@ -67,7 +104,7 @@ class ApiClient {
     Object? body,
     Map<String, String>? query,
   }) async {
-    final uri = Uri.parse('${AppConfig.apiBaseUrl}$path').replace(
+    final uri = Uri.parse('$baseUrl$path').replace(
       queryParameters: query,
     );
 
@@ -86,12 +123,26 @@ class ApiClient {
           .timeout(const Duration(seconds: 20));
       res = await http.Response.fromStream(streamed);
     } on TimeoutException {
-      throw ApiException(0, 'The server took too long to respond.');
+      throw ApiException(
+        0,
+        '$serverHost did not answer in time. If you are on mobile data, the '
+        'server address must be a public address — tap "Server address" below.',
+      );
     } on SocketException {
       throw ApiException(
         0,
-        'Cannot reach the server. Check that the API is running and that '
-        'the address in config.dart is correct.',
+        'Cannot reach $serverHost. Check your internet connection, or tap '
+        '"Server address" below to change it.',
+      );
+    } on http.ClientException {
+      throw ApiException(
+        0,
+        'Cannot connect to $serverHost. Check the server address below.',
+      );
+    } on HandshakeException {
+      throw ApiException(
+        0,
+        'Secure connection to $serverHost failed. Check the server address below.',
       );
     }
 

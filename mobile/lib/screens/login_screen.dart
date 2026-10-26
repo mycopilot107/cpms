@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           : const Text('Sign in'),
                     ),
                     const SizedBox(height: 20),
-                    _demoHint(),
+                    _serverRow(),
                   ],
                 ),
               ),
@@ -197,18 +197,96 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _demoHint() {
+  Widget _serverRow() {
+    final api = context.read<ApiClient>();
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: const Color(0xFFEEF2FF),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: const Text(
-        'Demo login\nworker@demo.test · password',
-        textAlign: TextAlign.center,
-        style: TextStyle(color: Color(0xFF4338CA), fontSize: 13, height: 1.4),
+      child: Row(
+        children: [
+          const Icon(Icons.dns_outlined, size: 18, color: Color(0xFF4338CA)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              api.serverHost,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Color(0xFF4338CA), fontSize: 13),
+            ),
+          ),
+          TextButton(
+            onPressed: _submitting ? null : _editServer,
+            child: const Text('Server address'),
+          ),
+        ],
       ),
     );
+  }
+
+  Future<void> _editServer() async {
+    final api = context.read<ApiClient>();
+    final controller = TextEditingController(text: api.baseUrl);
+
+    final value = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Server address'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Paste the address your company gave you, for example '
+              'https://your-company.com. On mobile data it must be a public '
+              'address, not 192.168.x.x.',
+              style: TextStyle(fontSize: 13, color: AppTheme.slate500),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              keyboardType: TextInputType.url,
+              autocorrect: false,
+              decoration: const InputDecoration(labelText: 'Address'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+
+    if (value == null || !mounted) return;
+
+    await api.saveBaseUrl(value);
+    setState(() {
+      _error = null;
+      _submitting = true;
+    });
+    final reachable = await api.ping();
+    if (!mounted) return;
+    setState(() {
+      _submitting = false;
+      if (!reachable) {
+        _error = 'Saved, but ${api.serverHost} is not answering. '
+            'Check the address and your internet connection.';
+      }
+    });
+    if (reachable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Connected to ${api.serverHost}')),
+      );
+    }
   }
 }

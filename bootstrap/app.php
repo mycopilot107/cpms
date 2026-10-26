@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Middleware\EnsureAccountActive;
+use App\Http\Middleware\EnsureStoryAdmin;
+use App\Http\Middleware\EnsureSubscriptionActive;
+use App\Http\Middleware\EnsureSuperAdmin;
+use App\Http\Middleware\ShareDisplayCurrency;
+use App\Support\Currency;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,24 +19,29 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // A local tunnel or reverse proxy terminates HTTPS and forwards from
+        // this machine. Trusting only loopback keeps forwarded headers from
+        // the open internet from being believed.
+        $middleware->trustProxies(at: ['127.0.0.1', '::1']);
+
         $middleware->alias([
-            'subscription' => \App\Http\Middleware\EnsureSubscriptionActive::class,
-            'story-admin'  => \App\Http\Middleware\EnsureStoryAdmin::class,
-            'super-admin'  => \App\Http\Middleware\EnsureSuperAdmin::class,
+            'subscription' => EnsureSubscriptionActive::class,
+            'story-admin' => EnsureStoryAdmin::class,
+            'super-admin' => EnsureSuperAdmin::class,
         ]);
 
         // Share the active display currency (INR/USD) with every web view, so
         // prices render in the visitor's currency sitewide.
         $middleware->web(append: [
-            \App\Http\Middleware\EnsureAccountActive::class,
-            \App\Http\Middleware\ShareDisplayCurrency::class,
+            EnsureAccountActive::class,
+            ShareDisplayCurrency::class,
         ]);
 
         // The display-currency cookie is a non-sensitive UI preference and is
         // also written client-side by the auto-detect script, so it must stay
         // unencrypted to round-trip between JS and the server.
         $middleware->encryptCookies(except: [
-            \App\Support\Currency::COOKIE,
+            Currency::COOKIE,
         ]);
 
         // Send unauthenticated web users to the login page (this framework
