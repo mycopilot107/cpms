@@ -132,6 +132,8 @@ class SitemapController extends Controller
             'Disallow: /subscription',
             'Disallow: /settings',
             'Disallow: /platform',
+            'Disallow: /admin',
+            'Disallow: /email/',
             'Disallow: /api/',
             'Disallow: /auth/',
             '',

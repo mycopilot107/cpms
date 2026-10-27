@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SendEmailController as AdminSendEmailController;
 use App\Http\Controllers\AdminStoryController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\EmailUnsubscribeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\LandingController;
@@ -107,6 +109,24 @@ Route::post('contact', [ContactController::class, 'storeContact'])
 Route::get('feedback', [ContactController::class, 'feedback'])->name('feedback');
 Route::post('feedback', [ContactController::class, 'storeFeedback'])
     ->middleware('throttle:10,1')->name('feedback.store');
+
+/*
+|--------------------------------------------------------------------------
+| Outreach email — login-free, gated by OUTREACH_ACCESS_KEY (see
+| EnsureOutreachAccess). Search finds public contractor/builder emails;
+| each address is stored and emailed at most once.
+|--------------------------------------------------------------------------
+*/
+Route::middleware('outreach')->prefix('admin/send-email')->name('admin.send-email.')->group(function () {
+    Route::get('/', [AdminSendEmailController::class, 'index'])->middleware('throttle:30,1')->name('index');
+    Route::post('/', [AdminSendEmailController::class, 'store'])->middleware('throttle:20,1')->name('store');
+    Route::post('search', [AdminSendEmailController::class, 'search'])->middleware('throttle:5,1')->name('search');
+    Route::post('send-now', [AdminSendEmailController::class, 'sendNow'])->middleware('throttle:10,1')->name('send-now');
+});
+
+Route::get('email/unsubscribe/{sendEmail}', EmailUnsubscribeController::class)
+    ->middleware(['signed', 'throttle:30,1'])
+    ->name('email.unsubscribe');
 
 /*
 |--------------------------------------------------------------------------

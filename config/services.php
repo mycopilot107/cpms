@@ -69,4 +69,17 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
     ],
 
+    /*
+     | Optional web search used by /admin/send-email to find public business
+     | emails. DuckDuckGo is always tried; these add more results when set.
+     */
+    'google_cse' => [
+        'key' => env('GOOGLE_CSE_API_KEY'),
+        'cx' => env('GOOGLE_CSE_CX'),
+    ],
+
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+    ],
+
 ];
