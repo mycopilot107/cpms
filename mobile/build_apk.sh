@@ -2,7 +2,7 @@
 #
 # Build the Best CPMS field app as a signed APK for direct download from
 # /get-the-app (alongside Google Play). The APK is copied to
-# storage/app/downloads/best-cpms-field.apk, outside the public folder; the
+# storage/app/private/best-cpms-field.apk, outside the public folder; the
 # website streams it from /download/android.
 #
 # Usage:
@@ -21,7 +21,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 API_BASE_URL="${1:-${API_BASE_URL:-}}"
-TARGET="../storage/app/downloads/best-cpms-field.apk"
+TARGET="../storage/app/private/best-cpms-field.apk"
 
 if ! command -v flutter >/dev/null 2>&1; then
   echo "ERROR: flutter is not installed or not on PATH." >&2
@@ -56,5 +56,5 @@ mkdir -p "$(dirname "$TARGET")"
 cp "$BUILT" "$TARGET"
 
 echo
-echo "✓ Done: storage/app/downloads/best-cpms-field.apk ($(du -h "$TARGET" | cut -f1))"
+echo "✓ Done: storage/app/private/best-cpms-field.apk ($(du -h "$TARGET" | cut -f1))"
 echo "  Commit and push it; /get-the-app shows the APK button once the file is on the server."
