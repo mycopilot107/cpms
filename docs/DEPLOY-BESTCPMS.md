@@ -80,8 +80,8 @@ apex (or vice-versa) so you have one canonical host.
 Build the signed bundle with `mobile/build_play_bundle.sh`, upload it in Play
 Console, and set `PLAY_TESTING_URL` (internal testing) or `PLAY_STORE_URL`
 (public) in the server `.env`. For the direct download, run
-`mobile/build_apk.sh` and upload `storage/app/downloads/best-cpms-field.apk` to
-the same path on the server. Full steps: `docs/MOBILE-BUILD.md`. Delete any old
+`mobile/build_apk.sh` and commit `storage/app/downloads/best-cpms-field.apk`
+(it is tracked by git) so it deploys with the code. Full steps: `docs/MOBILE-BUILD.md`. Delete any old
 `public/downloads/` folder on the server.
 
 ## Follow-up: social share image

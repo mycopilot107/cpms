@@ -57,4 +57,4 @@ cp "$BUILT" "$TARGET"
 
 echo
 echo "✓ Done: storage/app/downloads/best-cpms-field.apk ($(du -h "$TARGET" | cut -f1))"
-echo "  Upload that file to the same path on the server; /get-the-app shows the APK button once it exists."
+echo "  Commit and push it; /get-the-app shows the APK button once the file is on the server."

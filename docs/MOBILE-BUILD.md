@@ -6,8 +6,9 @@ The Android app is distributed two ways, both shown on `/get-the-app`:
   phone, updates automatically, nothing to allow in phone settings.
 - **Direct APK** (about 16 MB) for phones without Play access. Build it with
   `./build_apk.sh`; it lands in `storage/app/downloads/best-cpms-field.apk`
-  (outside `public/`) and is streamed by `/download/android`. Copy that file to
-  the same path on the server — the button appears once the file exists.
+  (outside `public/`) and is streamed by `/download/android`. That one file is
+  tracked by git, so commit and push it with the code — the button appears once
+  the file exists on the server.
 
 An APK install and a Play install are signed differently (Play re-signs with
 Google's key), so they can't update each other; switching needs an uninstall.
