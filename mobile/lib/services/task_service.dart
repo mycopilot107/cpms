@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/task.dart';
+import '../models/task_photo.dart';
 import 'api_client.dart';
 
 /// Loads and mutates the caller's assigned tasks.
@@ -71,6 +72,36 @@ class TaskService extends ChangeNotifier {
     _reconcile(updated);
     return updated;
   }
+
+  /// Photos on a task, newest first. Throws [ApiException].
+  Future<List<TaskPhoto>> photos(int taskId) async {
+    final body = await _api.get('/tasks/$taskId/photos');
+    final data = (body is Map<String, dynamic>) ? body['data'] : body;
+    return (data as List)
+        .map((e) => TaskPhoto.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Upload a photo from the camera or gallery. Throws [ApiException].
+  Future<TaskPhoto> uploadPhoto(int taskId, String filePath, {String? caption}) async {
+    final body = await _api.upload(
+      '/tasks/$taskId/photos',
+      field: 'photo',
+      filePath: filePath,
+      fields: {
+        if (caption != null && caption.trim().isNotEmpty) 'caption': caption.trim(),
+      },
+    );
+    final data = (body is Map<String, dynamic>) ? body['data'] : body;
+    return TaskPhoto.fromJson(data as Map<String, dynamic>);
+  }
+
+  Future<void> deletePhoto(int photoId) async {
+    await _api.delete('/photos/$photoId');
+  }
+
+  /// Image request headers (the bearer token) for protected photo URLs.
+  Map<String, String> get imageHeaders => _api.imageHeaders;
 
   /// Keep the visible list consistent after an update: drop a task that no
   /// longer belongs in the "open" scope, otherwise replace it in place.

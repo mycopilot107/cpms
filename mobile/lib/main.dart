@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
-import 'screens/task_list_screen.dart';
 import 'services/api_client.dart';
 import 'services/auth_service.dart';
+import 'services/daily_report_service.dart';
 import 'services/task_service.dart';
 import 'theme.dart';
 
@@ -30,6 +31,7 @@ class CpmsApp extends StatelessWidget {
         Provider<ApiClient>.value(value: api),
         ChangeNotifierProvider(create: (_) => AuthService(api)..bootstrap()),
         ChangeNotifierProvider(create: (_) => TaskService(api)),
+        Provider(create: (_) => DailyReportService(api)),
       ],
       child: MaterialApp(
         title: 'Best CPMS',
@@ -53,7 +55,7 @@ class _AuthGate extends StatelessWidget {
       case AuthStatus.unknown:
         return const _Splash();
       case AuthStatus.authenticated:
-        return const TaskListScreen();
+        return const HomeScreen();
       case AuthStatus.unauthenticated:
         return const LoginScreen();
     }

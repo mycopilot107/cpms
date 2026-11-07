@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Models\DailyReport;
 use App\Models\Project;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -47,7 +48,16 @@ class ProjectController extends Controller
 
         $project->load(['creator', 'tasks.assignee']);
 
-        return view('projects.show', ['project' => $project]);
+        $dailyReports = DailyReport::query()
+            ->with('user')
+            ->withCount('photos')
+            ->where('project_id', $project->id)
+            ->when(! request()->user()->can('viewAll', DailyReport::class), fn ($q) => $q->where('user_id', request()->user()->id))
+            ->orderByDesc('report_date')
+            ->limit(7)
+            ->get();
+
+        return view('projects.show', ['project' => $project, 'dailyReports' => $dailyReports]);
     }
 
     public function edit(Project $project): View

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AccountPasswordController;
+use App\Http\Controllers\AccountProfileController;
 use App\Http\Controllers\Admin\SendEmailController as AdminSendEmailController;
 use App\Http\Controllers\AdminStoryController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -7,10 +9,12 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\BoqImportController;
 use App\Http\Controllers\BoqItemController;
 use App\Http\Controllers\CompanySettingsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\DailyReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EmailUnsubscribeController;
@@ -21,13 +25,21 @@ use App\Http\Controllers\MilestoneController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PlanningController;
 use App\Http\Controllers\PlatformController;
+use App\Http\Controllers\PlatformMessageController;
+use App\Http\Controllers\PlatformOverviewController;
+use App\Http\Controllers\PlatformPaymentController;
+use App\Http\Controllers\PlatformSmtpController;
+use App\Http\Controllers\PlatformUserController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectPaymentController;
+use App\Http\Controllers\ProjectShareController;
+use App\Http\Controllers\PublicWeeklyReportController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskPhotoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -79,9 +91,8 @@ foreach (array_keys(config('landing.pages', [])) as $landingKey) {
         ->name('landing.'.$landingKey);
 }
 
-// Mobile app — public landing page + the Android APK download. The APK is
-// produced locally (see mobile/build_apk.sh) and dropped into public/downloads;
-// the controller serves it if present and degrades gracefully if not.
+// Mobile app — public landing page with the Google Play link. The old
+// /download/android URL redirects to Google Play; no APK is served.
 Route::get('get-the-app', [DownloadController::class, 'app'])->name('app.download-page');
 Route::get('download/android', [DownloadController::class, 'android'])->name('app.download');
 
@@ -100,6 +111,16 @@ Route::get('privacy-policy', [PageController::class, 'privacy'])->name('privacy'
 Route::get('terms-and-conditions', [PageController::class, 'terms'])->name('terms');
 Route::get('refund-policy', [PageController::class, 'refund'])->name('refund');
 Route::get('cookie-policy', [PageController::class, 'cookies'])->name('cookies');
+
+// Weekly project update for the client — no login, just the unguessable link.
+Route::get('share/{token}', [PublicWeeklyReportController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]{40}')
+    ->middleware('throttle:60,1')
+    ->name('weekly-update.show');
+Route::get('share/{token}/photos/{kind}/{photo}', [PublicWeeklyReportController::class, 'photo'])
+    ->where(['token' => '[A-Za-z0-9]{40}', 'kind' => 'task|daily', 'photo' => '[0-9]+'])
+    ->middleware('throttle:240,1')
+    ->name('weekly-update.photo');
 
 // Contact + customer feedback (persist to DB, email shobha.solanki107@gmail.com).
 // Throttled to blunt spam/abuse of the public POST endpoints.
@@ -179,6 +200,17 @@ Route::middleware('auth')->group(function () {
 
     Route::view('subscription/expired', 'subscription.expired')->name('subscription.expired');
 
+    // My account (profile + password) — every signed-in user and role,
+    // outside the subscription gate.
+    Route::get('account', [AccountProfileController::class, 'edit'])->name('account.profile');
+    Route::put('account', [AccountProfileController::class, 'update'])
+        ->middleware('throttle:10,1')
+        ->name('account.profile.update');
+    Route::get('account/password', [AccountPasswordController::class, 'edit'])->name('account.password');
+    Route::put('account/password', [AccountPasswordController::class, 'update'])
+        ->middleware('throttle:6,1')
+        ->name('account.password.update');
+
     // Company profile (country, currency, tax ID). Owners/admins only, checked
     // in the controller and form request.
     Route::get('company/settings', [CompanySettingsController::class, 'edit'])->name('company.settings');
@@ -209,15 +241,36 @@ Route::middleware('auth')->group(function () {
     });
 
     /*
-      | Platform console — super admins only (gated by the `super-admin`
-      | middleware and users.is_admin). This is the one area
-     | that crosses the tenant boundary: it lists every company and its
-     | subscription expiry. Read-only, and kept OUTSIDE the subscription gate so
-     | a super admin can always reach it regardless of their own company state.
+     | Platform console — super admins only (gated by the `super-admin`
+     | middleware and users.is_admin). This is the one area that crosses the
+     | tenant boundary: every company, its expiry, add/edit, and the SMTP
+     | check. Kept OUTSIDE the subscription gate so a super admin can always
+     | reach it regardless of their own company state.
      */
     Route::middleware('super-admin')->prefix('platform')->name('platform.')->group(function () {
+        Route::get('/', [PlatformOverviewController::class, 'index'])->name('overview');
+
+        Route::get('payments', [PlatformPaymentController::class, 'index'])->name('payments.index');
+        Route::get('payments/{payment}', [PlatformPaymentController::class, 'show'])
+            ->whereNumber('payment')
+            ->name('payments.show');
+
+        Route::get('users', [PlatformUserController::class, 'index'])->name('users.index');
+
+        Route::get('messages', [PlatformMessageController::class, 'index'])->name('messages.index');
+        Route::get('messages/{message}', [PlatformMessageController::class, 'show'])->name('messages.show');
+
         Route::get('companies', [PlatformController::class, 'index'])->name('companies.index');
+        Route::get('companies/create', [PlatformController::class, 'create'])->name('companies.create');
+        Route::post('companies', [PlatformController::class, 'store'])->name('companies.store');
         Route::get('companies/{company}', [PlatformController::class, 'show'])->name('companies.show');
+        Route::get('companies/{company}/edit', [PlatformController::class, 'edit'])->name('companies.edit');
+        Route::put('companies/{company}', [PlatformController::class, 'update'])->name('companies.update');
+
+        Route::get('smtp-test', [PlatformSmtpController::class, 'index'])->name('smtp-test');
+        Route::post('smtp-test', [PlatformSmtpController::class, 'send'])
+            ->middleware('throttle:10,1')
+            ->name('smtp-test.send');
     });
 
     // Main application — requires an active trial or subscription.
@@ -225,7 +278,23 @@ Route::middleware('auth')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('projects', ProjectController::class);
+        Route::get('projects/{project}/share', [ProjectShareController::class, 'index'])->name('projects.share');
+        Route::post('projects/{project}/share', [ProjectShareController::class, 'store'])
+            ->middleware('throttle:20,1')
+            ->name('projects.share.store');
+        Route::delete('share-links/{link}', [ProjectShareController::class, 'revoke'])->name('share-links.revoke');
         Route::resource('tasks', TaskController::class);
+        Route::post('tasks/{task}/photos', [TaskPhotoController::class, 'store'])
+            ->middleware('throttle:20,1')
+            ->name('tasks.photos.store');
+        Route::get('task-photos/{photo}', [TaskPhotoController::class, 'file'])->name('task-photos.file');
+
+        // Daily site reports filed from the app.
+        Route::get('daily-reports', [DailyReportController::class, 'index'])->name('daily-reports.index');
+        Route::get('daily-reports/{report}', [DailyReportController::class, 'show'])->name('daily-reports.show');
+        Route::get('daily-report-photos/{photo}', [DailyReportController::class, 'photo'])->name('daily-report-photos.file');
+        Route::delete('daily-report-photos/{photo}', [DailyReportController::class, 'destroyPhoto'])->name('daily-report-photos.destroy');
+        Route::delete('task-photos/{photo}', [TaskPhotoController::class, 'destroy'])->name('task-photos.destroy');
         Route::resource('users', UserController::class)->except(['show']);
 
         /*
@@ -243,6 +312,20 @@ Route::middleware('auth')->group(function () {
          | (default would be {boq_item} / {project_payment}).
          */
         Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
+        // BOQ import from Excel/CSV: upload → preview → confirm.
+        Route::get('boq-items/import', [BoqImportController::class, 'create'])->name('boq-items.import.create');
+        Route::post('boq-items/import', [BoqImportController::class, 'store'])
+            ->middleware('throttle:20,1')
+            ->name('boq-items.import.store');
+        Route::get('boq-items/import/template', [BoqImportController::class, 'template'])->name('boq-items.import.template');
+        Route::get('boq-items/import/{token}', [BoqImportController::class, 'preview'])
+            ->where('token', '[A-Za-z0-9]{32}')
+            ->name('boq-items.import.preview');
+        Route::post('boq-items/import/{token}', [BoqImportController::class, 'import'])
+            ->where('token', '[A-Za-z0-9]{32}')
+            ->middleware('throttle:20,1')
+            ->name('boq-items.import.confirm');
+
         Route::resource('boq-items', BoqItemController::class)
             ->except(['show'])
             ->parameters(['boq-items' => 'boqItem']);

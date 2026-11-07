@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,8 +13,14 @@ class Company extends Model
 {
     use HasFactory;
 
-    /** Length of the free trial, in days. */
-    public const TRIAL_DAYS = 15;
+    /** Shortest free trial, in days. */
+    public const TRIAL_DAYS = 30;
+
+    /** A month-end this soon after sign-up has too little data to judge, so the next one counts. */
+    public const TRIAL_MONTH_END_MIN_DAYS = 14;
+
+    /** Days after that month-end to run the month-end report and the bill. */
+    public const TRIAL_REPORT_GRACE_DAYS = 7;
 
     public const STATUS_ACTIVE = 'active';
 
@@ -92,6 +99,28 @@ class Company extends Model
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * When a trial that starts at $start ends: at least TRIAL_DAYS, and always
+     * past one full month-end plus a week to run the month-end report — a
+     * construction billing cycle is monthly, so a shorter trial never shows it.
+     *
+     * Sign-up 1 Nov → 7 Dec; 7 Nov → 7 Dec; 20 Nov → 7 Jan.
+     */
+    public static function trialEndsAt(CarbonInterface $start): Carbon
+    {
+        $start = Carbon::instance($start);
+
+        $monthEnd = $start->copy()->endOfMonth();
+        if ($start->diffInDays($monthEnd) < self::TRIAL_MONTH_END_MIN_DAYS) {
+            $monthEnd = $start->copy()->addMonthNoOverflow()->endOfMonth();
+        }
+
+        $afterMonthEnd = $monthEnd->copy()->addDays(self::TRIAL_REPORT_GRACE_DAYS)->endOfDay();
+        $afterDays = $start->copy()->addDays(self::TRIAL_DAYS);
+
+        return $afterDays->greaterThan($afterMonthEnd) ? $afterDays : $afterMonthEnd;
+    }
+
     public function isOnTrial(): bool
     {
         return $this->trial_ends_at !== null && $this->trial_ends_at->isFuture();
@@ -146,10 +175,16 @@ class Company extends Model
         return $this->activeSubscription() !== null;
     }
 
+    /** Suspended and inactive companies are locked out by the platform admin. */
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
     /** The single check the subscription gate uses. */
     public function hasAccess(): bool
     {
-        return $this->isOnTrial() || $this->hasActiveSubscription();
+        return $this->isActive() && ($this->isOnTrial() || $this->hasActiveSubscription());
     }
 
     /**

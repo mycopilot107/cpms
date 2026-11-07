@@ -6,6 +6,7 @@
 @section('actions')
     <a href="{{ route('finance.index') }}" class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Back to Finance</a>
     @can('create', App\Models\BoqItem::class)
+        <a href="{{ route('boq-items.import.create', ['project' => $selectedProject?->id]) }}" class="rounded-md border border-indigo-300 bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100">Import from Excel</a>
         <a href="{{ route('boq-items.create', ['project' => $selectedProject?->id]) }}" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">New BOQ item</a>
     @endcan
 @endsection

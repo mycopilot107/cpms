@@ -10,7 +10,7 @@
     $faqs = [
         ['Getting started', [
             ['How long does setup take?', 'Most teams load their first live project in an afternoon. There\'s no installation — Best CPMS runs in the browser, and site teams can use it on their phones straight away.'],
-            ['Do you offer a free trial?', 'Yes. Every account starts with a 15-day free trial with no card required. You only enter billing details when you decide to subscribe.'],
+            ['Do you offer a free trial?', 'Yes, with no card required. The trial lasts at least '.\App\Models\Company::TRIAL_DAYS.' days and always runs past your first month-end plus a week, so you can close one full billing cycle — BOQ, expenses, payments and the month-end report — before deciding. You only enter billing details when you subscribe.'],
             ['Can we import existing projects?', 'You can set up projects, milestones, and a BOQ manually, and our team will help you migrate live projects during onboarding.'],
         ]],
         ['Pricing & billing', [

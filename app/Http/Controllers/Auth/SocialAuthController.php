@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
  *   2. Else match on email              -> LINK the provider to that existing
  *      account (only if the provider verified the email, to prevent takeover).
  *   3. Else                             -> provision a brand-new tenant
- *      (company + owner + 15-day trial), mirroring RegisteredUserController.
+ *      (company + owner + free trial), mirroring RegisteredUserController.
  *
  * Guarded columns (company_id / role / status / provider*) are always set in
  * this server-side code, never from request input.
@@ -146,7 +146,7 @@ class SocialAuthController extends Controller
     {
         return DB::transaction(function () use ($provider, $profile, $email): User {
             $now = now();
-            $trialEndsAt = now()->addDays(Company::TRIAL_DAYS);
+            $trialEndsAt = Company::trialEndsAt($now);
             $name = $profile['name'] ?: Str::before($email, '@');
 
             $company = Company::create([

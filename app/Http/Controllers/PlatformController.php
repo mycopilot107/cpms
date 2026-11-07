@@ -2,19 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePlatformCompanyRequest;
+use App\Http\Requests\UpdatePlatformCompanyRequest;
 use App\Models\Company;
+use App\Models\Payment;
 use App\Models\Subscription;
+use App\Services\CompanyProvisioner;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 /**
  * Platform console for super admins (see config/platform.php).
  *
  * This is the one place in the app that deliberately crosses the tenant
- * boundary: it lists EVERY company and its subscription / trial expiry. Access
- * is restricted by the `super-admin` middleware; the controller itself is
- * strictly read-only and changes nothing about any company.
+ * boundary: it lists EVERY company and its subscription / trial expiry, and
+ * lets a super admin add a company or edit its profile, status, and trial
+ * end date. Access is restricted by the `super-admin` middleware.
  */
 class PlatformController extends Controller
 {
@@ -60,6 +67,55 @@ class PlatformController extends Controller
         ]);
     }
 
+    public function create(): View
+    {
+        return view('platform.companies.create', ['standardTrialEnds' => Company::trialEndsAt(now())]);
+    }
+
+    /** Add a company with its owner login and a trial, like a self sign-up. */
+    public function store(StorePlatformCompanyRequest $request, CompanyProvisioner $provisioner): RedirectResponse
+    {
+        $data = $request->validated();
+
+        $owner = $provisioner->provision(
+            company: collect($data)->only(['name', 'email', 'phone', 'country', 'currency', 'address', 'city', 'state', 'gst_number'])->all(),
+            owner: [
+                'name' => $data['owner_name'],
+                'email' => $data['owner_email'],
+                'password' => $data['owner_password'],
+            ],
+            trialDays: isset($data['trial_days']) ? (int) $data['trial_days'] : null,
+        );
+
+        return redirect()
+            ->route('platform.companies.show', $owner->company_id)
+            ->with('status', 'Company added. The owner can sign in with '.$owner->email.'.');
+    }
+
+    public function edit(Company $company): View
+    {
+        return view('platform.companies.edit', ['company' => $company]);
+    }
+
+    /** Edit profile, status, and trial end date. Suspended/inactive blocks access. */
+    public function update(UpdatePlatformCompanyRequest $request, Company $company): RedirectResponse
+    {
+        $data = $request->validated();
+        $trialEndsAt = isset($data['trial_ends_at']) ? Carbon::parse($data['trial_ends_at'])->endOfDay() : null;
+
+        DB::transaction(function () use ($company, $data, $trialEndsAt): void {
+            $company->update(collect($data)->except('trial_ends_at')->all() + ['trial_ends_at' => $trialEndsAt]);
+
+            $company->subscriptions()
+                ->where('status', Subscription::STATUS_TRIAL)
+                ->update(['trial_ends_at' => $trialEndsAt]);
+        });
+
+        return redirect()
+            ->route('platform.companies.show', $company)
+            ->with('status', 'Company updated.');
+    }
+
     /** Read-only detail for one company: profile, team, and subscription history. */
     public function show(Company $company): View
     {
@@ -71,6 +127,11 @@ class PlatformController extends Controller
 
         return view('platform.companies.show', [
             'company' => $company,
+            'payments' => Payment::acrossCompanies()
+                ->with('user')
+                ->where('company_id', $company->id)
+                ->latest()
+                ->get(),
         ]);
     }
 

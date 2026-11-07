@@ -29,11 +29,8 @@ class UserPolicy
             return false;
         }
 
-        // Anyone may edit their own profile.
-        if ($user->id === $model->id) {
-            return true;
-        }
-
+        // The team form also sets role and status, so only owners/admins use
+        // it. Everyone edits their own name, email, and phone under My account.
         if (! $user->isAdmin()) {
             return false;
         }

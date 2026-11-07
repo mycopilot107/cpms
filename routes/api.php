@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DailyReportController;
 use App\Http\Controllers\Api\RazorpayWebhookController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\TaskPhotoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,4 +41,18 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/tasks', [TaskController::class, 'index']);
     Route::get('/tasks/{task}', [TaskController::class, 'show']);
     Route::patch('/tasks/{task}', [TaskController::class, 'update']);
+
+    // Daily site reports (what happened, labour, note, photos).
+    Route::get('/daily-reports/projects', [DailyReportController::class, 'projects']);
+    Route::get('/daily-reports', [DailyReportController::class, 'index']);
+    Route::post('/daily-reports', [DailyReportController::class, 'store'])->middleware('throttle:30,1');
+    Route::post('/daily-reports/{report}/photos', [DailyReportController::class, 'storePhoto'])->middleware('throttle:30,1');
+    Route::delete('/daily-report-photos/{photo}', [DailyReportController::class, 'destroyPhoto']);
+    Route::get('/daily-report-photos/{photo}/file', [DailyReportController::class, 'photoFile'])->name('api.daily-report-photos.file');
+
+    // Site photos on a task.
+    Route::get('/tasks/{task}/photos', [TaskPhotoController::class, 'index']);
+    Route::post('/tasks/{task}/photos', [TaskPhotoController::class, 'store'])->middleware('throttle:30,1');
+    Route::delete('/photos/{photo}', [TaskPhotoController::class, 'destroy']);
+    Route::get('/photos/{photo}/file', [TaskPhotoController::class, 'file'])->name('api.task-photos.file');
 });

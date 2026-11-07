@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
 
             $user = $token->user;
 
-            if (! $user || ! $user->isActive()) {
+            if (! $user || ! $user->isActive() || ! $user->company?->isActive()) {
                 return null;
             }
 
@@ -71,7 +71,7 @@ class AppServiceProvider extends ServiceProvider
             $broker = config('auth.defaults.passwords');
             $expireMinutes = (int) config("auth.passwords.{$broker}.expire", 60);
 
-            return (new MailMessage())
+            return (new MailMessage)
                 ->subject('Reset your Best CPMS password')
                 ->greeting('Password reset request')
                 ->line('We received a request to reset the password for your Best CPMS account.')

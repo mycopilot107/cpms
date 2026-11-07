@@ -8,6 +8,7 @@ import '../services/api_client.dart';
 import '../services/task_service.dart';
 import '../theme.dart';
 import '../widgets/pills.dart';
+import '../widgets/task_photos.dart';
 
 /// The four task statuses, mirroring Task::STATUSES on the server.
 const List<String> kStatuses = ['pending', 'in_progress', 'completed', 'cancelled'];
@@ -99,6 +100,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           _detailsCard(task),
           const SizedBox(height: 16),
           _updateCard(),
+          const SizedBox(height: 16),
+          TaskPhotosCard(taskId: task.id),
         ],
       ),
     );

@@ -69,7 +69,7 @@
         ],
         [
             'q' => 'Is there a free trial?',
-            'a' => 'Yes. Every new company starts with a '.$trialDays.'-day free trial — no credit card required. You get full access during the trial and only pay when you decide to continue.',
+            'a' => 'Yes. Every new company gets a free trial of at least '.$trialDays.' days that always runs past its first month-end, so you can close one full billing cycle — no credit card required. You get full access during the trial and only pay when you decide to continue.',
         ],
     ];
 @endphp

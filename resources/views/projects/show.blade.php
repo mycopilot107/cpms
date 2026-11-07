@@ -4,6 +4,9 @@
 @section('heading', $project->name)
 
 @section('actions')
+    @if (auth()->user()->canManagePlanning())
+        <a href="{{ route('projects.share', $project) }}" class="rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100">Share weekly update</a>
+    @endif
     <a href="{{ route('tasks.create', ['project' => $project->id]) }}" class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Add task</a>
     @can('update', $project)
         <a href="{{ route('projects.edit', $project) }}" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Edit</a>
@@ -61,6 +64,29 @@
                         </a>
                     @empty
                         <p class="px-6 py-8 text-center text-sm text-slate-400">No tasks on this project yet.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-slate-200 bg-white">
+                <div class="flex items-center justify-between border-b border-slate-100 px-6 py-3">
+                    <h3 class="font-semibold text-slate-900">Daily site reports</h3>
+                    <a href="{{ route('daily-reports.index', ['project' => $project->id]) }}" class="text-sm text-indigo-600 hover:text-indigo-500">All reports</a>
+                </div>
+                <div class="divide-y divide-slate-100">
+                    @forelse ($dailyReports as $report)
+                        <a href="{{ route('daily-reports.show', $report) }}" class="flex items-start justify-between gap-4 px-6 py-3 hover:bg-slate-50">
+                            <div class="min-w-0">
+                                <div class="text-sm font-medium text-slate-800">{{ $report->report_date->format('D, d M') }} · {{ $report->user?->name ?? 'Removed user' }}</div>
+                                <div class="truncate text-xs text-slate-500">{{ $report->work_done }}</div>
+                            </div>
+                            <div class="shrink-0 text-right text-xs text-slate-500">
+                                <div class="font-semibold text-slate-800">{{ $report->labour_count }} labour</div>
+                                @if ($report->photos_count)<div>{{ $report->photos_count }} photo(s)</div>@endif
+                            </div>
+                        </a>
+                    @empty
+                        <p class="px-6 py-8 text-center text-sm text-slate-400">No daily reports yet. Site staff file them from the Android app.</p>
                     @endforelse
                 </div>
             </div>

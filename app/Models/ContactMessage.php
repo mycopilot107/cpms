@@ -16,6 +16,7 @@ class ContactMessage extends Model
     use HasFactory;
 
     public const TYPE_CONTACT = 'contact';
+
     public const TYPE_FEEDBACK = 'feedback';
 
     protected $fillable = [
@@ -32,6 +33,7 @@ class ContactMessage extends Model
 
     protected $casts = [
         'rating' => 'integer',
+        'read_at' => 'datetime',
     ];
 
     public function isFeedback(): bool

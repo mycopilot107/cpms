@@ -43,7 +43,7 @@ class AuthController extends Controller
         // scope, so the lookup is safe pre-authentication.
         $user = User::where('email', $email)->first();
 
-        if (! $user || ! is_string($user->password) || ! Hash::check($credentials['password'], $user->password) || ! $user->isActive()) {
+        if (! $user || ! is_string($user->password) || ! Hash::check($credentials['password'], $user->password) || ! $user->isActive() || ! $user->company?->isActive()) {
             RateLimiter::hit($throttleKey);
 
             throw ValidationException::withMessages([

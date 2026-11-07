@@ -34,7 +34,10 @@
             <p class="mt-1 text-sm text-slate-500">Registered {{ $company->created_at?->format('j M Y') ?? '—' }}</p>
         </div>
         <div class="flex flex-col items-end gap-2">
-            <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset {{ $stateBadge[$state] }}">{{ $stateLabel[$state] }}</span>
+            <div class="flex items-center gap-3">
+                <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset {{ $stateBadge[$state] }}">{{ $stateLabel[$state] }}</span>
+                <a href="{{ route('platform.companies.edit', $company) }}" class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Edit company</a>
+            </div>
             @if ($expiry)
                 <p class="text-sm {{ $expiry->isPast() ? 'text-rose-600' : 'text-slate-600' }}">
                     {{ $expiry->isPast() ? 'Expired' : 'Access until' }} {{ $expiry->format('j M Y') }} ({{ $expiry->diffForHumans() }})
@@ -47,7 +50,8 @@
     <section class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 class="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-slate-500">Company</h2>
         <dl class="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
-            <div><dt class="text-xs text-slate-400">Status</dt><dd class="text-slate-800">{{ ucfirst($company->status) }}</dd></div>
+            <div><dt class="text-xs text-slate-400">Status</dt><dd class="{{ $company->isActive() ? 'text-slate-800' : 'font-semibold text-rose-600' }}">{{ ucfirst($company->status) }}</dd></div>
+            <div><dt class="text-xs text-slate-400">Country / currency</dt><dd class="text-slate-800">{{ $company->country }} · {{ $company->currency }}</dd></div>
             <div><dt class="text-xs text-slate-400">Owner</dt><dd class="text-slate-800">{{ $company->owner?->name ?? '—' }}</dd></div>
             <div><dt class="text-xs text-slate-400">Email</dt><dd class="text-slate-800">{{ $company->email ?: '—' }}</dd></div>
             <div><dt class="text-xs text-slate-400">Phone</dt><dd class="text-slate-800">{{ $company->phone ?: '—' }}</dd></div>
@@ -87,6 +91,51 @@
                                 <td class="py-2 pr-4 text-slate-600">{{ $sub->amount ? $sub->currency . ' ' . number_format($sub->amount) : '—' }}</td>
                                 <td class="py-2 pr-4 text-slate-600">{{ $sub->starts_at?->format('j M Y') ?? '—' }}</td>
                                 <td class="py-2 pr-4 text-slate-600">{{ $sub->ends_at?->format('j M Y') ?? '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </section>
+
+    {{-- Payments --}}
+    <section class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="mb-4 flex items-center justify-between">
+            <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">Payments ({{ $payments->count() }})</h2>
+            @php($paidTotals = $payments->where('status', \App\Models\Payment::STATUS_PAID)->groupBy('currency')->map->sum('amount'))
+            @if ($paidTotals->isNotEmpty())
+                <p class="text-sm text-slate-600">Paid in total:
+                    @foreach ($paidTotals as $currency => $total)
+                        <span class="font-semibold text-emerald-700">{{ \App\Support\Currency::format($total, $currency) }} {{ $currency }}</span>@if (! $loop->last), @endif
+                    @endforeach
+                </p>
+            @endif
+        </div>
+        @if ($payments->isEmpty())
+            <p class="text-sm text-slate-500">No payment attempts yet.</p>
+        @else
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 text-sm">
+                    <thead class="text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <tr>
+                            <th class="py-2 pr-4">Date</th>
+                            <th class="py-2 pr-4">Plan</th>
+                            <th class="py-2 pr-4 text-right">Amount</th>
+                            <th class="py-2 pr-4">Status</th>
+                            <th class="py-2 pr-4">Paid by</th>
+                            <th class="py-2 pr-4"><span class="sr-only">Details</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach ($payments as $payment)
+                            <tr>
+                                <td class="whitespace-nowrap py-2 pr-4 text-slate-600">{{ $payment->created_at?->format('j M Y, H:i') }}</td>
+                                <td class="py-2 pr-4 text-slate-600">{{ $payment->seats }} users · {{ $payment->months }} mo</td>
+                                <td class="whitespace-nowrap py-2 pr-4 text-right font-medium text-slate-800">{{ \App\Support\Currency::format($payment->amount, $payment->currency) }} {{ $payment->currency }}</td>
+                                <td class="py-2 pr-4">@include('platform.partials.payment-status', ['status' => $payment->status])</td>
+                                <td class="py-2 pr-4 text-slate-600">{{ $payment->user?->email ?? '—' }}</td>
+                                <td class="py-2 pr-4 text-right"><a href="{{ route('platform.payments.show', $payment->id) }}" class="font-medium text-indigo-600 hover:text-indigo-500">Details</a></td>
                             </tr>
                         @endforeach
                     </tbody>

@@ -39,7 +39,7 @@
                     <a href="{{ route('register') }}" class="rounded-md bg-amber-500 px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-amber-600">Start your free trial</a>
                     <a href="{{ route('features') }}" class="rounded-md border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-800 transition hover:border-slate-400">See what's inside</a>
                 </div>
-                <p class="mt-4 text-sm text-slate-500">15-day trial · No card required · Set up in an afternoon</p>
+                <p class="mt-4 text-sm text-slate-500">{{ \App\Models\Company::TRIAL_DAYS }}-day trial, through your first month-end · No card required</p>
             </div>
 
             {{-- Product-grounded visual: a live-looking programme strip --}}

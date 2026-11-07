@@ -1,3 +1,11 @@
+# Site photos and BOQ spreadsheets are larger than PHP's 2 MB default.
+# Ignored when PHP runs as FPM; set the same values in php.ini there.
+<IfModule php_module>
+    php_value upload_max_filesize 16M
+    php_value post_max_size 40M
+    php_value max_file_uploads 20
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

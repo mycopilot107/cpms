@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed one demo tenant: a company, its team, a 15-day trial subscription,
+     * Seed one demo tenant: a company, its team, a free-trial subscription,
      * and a handful of projects with tasks — all created atomically inside a
      * transaction, mirroring the real company-registration flow.
      *
@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
 
         DB::transaction(function () use ($ownerEmail) {
             $now = now();
-            $trialEnds = $now->copy()->addDays(Company::TRIAL_DAYS);
+            $trialEnds = Company::trialEndsAt($now);
 
             $company = Company::create([
                 'name' => 'ABC Construction',

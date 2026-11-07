@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Download the Best CPMS field app for Android')
-@section('meta_description', 'Download the Best CPMS mobile app for Android. Field workers sign in to see their assigned tasks and report status, progress and hours straight from site.')
+@section('title', 'Get the Best CPMS field app for Android')
+@section('meta_description', 'Get the Best CPMS field app for Android on Google Play. Site staff see their tasks, file the daily site report, and send photos from site.')
 @section('meta_keywords', 'construction field app, construction site app android, best cpms mobile app download, construction task app, site progress app')
 
 @section('content')
@@ -31,21 +31,29 @@
                     </p>
 
                     <div class="mt-8">
-                        @if ($available)
-                            <a href="{{ route('app.download') }}"
-                               class="inline-flex items-center gap-3 rounded-md bg-[#3DDC84] px-6 py-3 font-semibold text-slate-900 shadow-sm transition hover:bg-[#32c976] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
-                                @include('partials.android-icon', ['class' => 'h-6 w-6'])
-                                Download the Android app
+                        @if ($playUrl)
+                            <a href="{{ $playUrl }}" target="_blank" rel="noopener"
+                               class="inline-flex items-center gap-3 rounded-lg bg-slate-900 px-5 py-3 text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+                                <svg class="h-7 w-7" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="#34A853" d="M3.6 1.8 13.8 12 3.6 22.2c-.4-.2-.6-.7-.6-1.2V3c0-.5.2-1 .6-1.2Z"/>
+                                    <path fill="#FBBC04" d="m17.2 8.6-3.4 3.4 3.4 3.4 3.9-2.2c1-.6 1-2 0-2.5l-3.9-2.1Z"/>
+                                    <path fill="#4285F4" d="M3.6 1.8c.3-.2.8-.2 1.2 0l12.4 6.8-3.4 3.4L3.6 1.8Z"/>
+                                    <path fill="#EA4335" d="M3.6 22.2 13.8 12l3.4 3.4-12.4 6.8c-.4.2-.9.2-1.2 0Z"/>
+                                </svg>
+                                <span class="text-left leading-tight">
+                                    <span class="block text-[11px] uppercase tracking-wide text-slate-300">{{ $playMode === 'testing' ? 'Join the test on' : 'Get it on' }}</span>
+                                    <span class="block text-lg font-semibold">Google Play</span>
+                                </span>
                             </a>
                             <p class="mt-3 text-sm text-slate-500">
-                                Android APK · {{ $apkSize }}@if ($apkUpdated) · updated {{ $apkUpdated->format('j M Y') }}@endif
+                                Installs and updates through the Play Store — no settings to change.
                             </p>
                         @else
                             <span class="inline-flex items-center gap-3 rounded-md border border-slate-300 bg-slate-100 px-6 py-3 font-semibold text-slate-400">
                                 @include('partials.android-icon', ['class' => 'h-6 w-6'])
-                                Android app coming soon
+                                Coming soon to Google Play
                             </span>
-                            <p class="mt-3 text-sm text-slate-500">The download will appear here as soon as the build is published.</p>
+                            <p class="mt-3 text-sm text-slate-500">The Google Play link will appear here as soon as the app is published.</p>
                         @endif
                     </div>
 
@@ -87,9 +95,9 @@
             {{-- What you can do --}}
             <div class="mt-16 grid gap-6 sm:grid-cols-3">
                 @foreach ([
-                    ['See your tasks', 'Everything assigned to you, with status, priority and due dates — no digging.'],
-                    ['Report from site', 'Update status, set percent complete, and log the hours you actually worked.'],
-                    ['Stays in sync', 'Signs in with your normal work account; updates show up for the office instantly.'],
+                    ['Daily site report', 'What happened today, labour by trade, a note, and photos — filed in a minute.'],
+                    ['Tasks and photos', 'See what is assigned to you, update progress, and add site photos to the task.'],
+                    ['Stays in sync', 'Signs in with your normal work account; the office sees updates straight away.'],
                 ] as $f)
                     <div class="rounded-xl border border-slate-200 p-6">
                         <h3 class="font-display font-semibold text-slate-900">{{ $f[0] }}</h3>
@@ -99,17 +107,26 @@
             </div>
 
             {{-- Install steps --}}
+            @php
+                $steps = $playMode === 'testing'
+                    ? [
+                        ['Send us your Google account', 'The app is in early access. Ask your company owner, or contact Best CPMS, to add the Gmail / Google account you use on your phone as a tester.'],
+                        ['Accept the invite', 'On your phone, open the Google Play link above with that account and tap “Become a tester”, then “Download it on Google Play”.'],
+                        ['Install and sign in', 'Install Best CPMS Field from the Play Store and sign in with the same email and password you use on the web.'],
+                    ]
+                    : [
+                        ['Open Google Play', 'Tap “Get it on Google Play” above, or search the Play Store for Best CPMS Field.'],
+                        ['Install', 'Tap Install. Updates arrive through the Play Store automatically.'],
+                        ['Sign in', 'Open Best CPMS Field and sign in with the same email and password you use on the web.'],
+                    ];
+            @endphp
             <div class="mt-12 rounded-xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
                 <h2 class="font-display font-semibold text-slate-900">Installing on Android</h2>
                 <p class="mt-2 text-sm text-slate-600">
-                    The app is distributed as a direct download (APK), so the first install takes one extra tap to allow it.
+                    The app comes from Google Play, so there is nothing to allow in your phone's settings.
                 </p>
                 <ol class="mt-5 space-y-4">
-                    @foreach ([
-                        ['Download the APK', 'Tap “Download for Android” above and open the file when it finishes.'],
-                        ['Allow the install', 'Android will ask whether to allow installs from your browser or Files app — tap allow, then confirm the install.'],
-                        ['Sign in', 'Open Best CPMS Field and sign in with the same email and password you use on the web.'],
-                    ] as $i => $step)
+                    @foreach ($steps as $i => $step)
                         <li class="flex gap-4">
                             <span class="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">{{ $i + 1 }}</span>
                             <div>
@@ -120,7 +137,10 @@
                     @endforeach
                 </ol>
                 <p class="mt-6 text-xs text-slate-500">
-                    Requires Android 6.0 or newer. Your device needs to reach the Best CPMS server — if your company runs Best CPMS on an internal network, make sure your phone is on the same network or VPN.
+                    Requires Android 7.0 or newer and an internet connection (Wi-Fi or mobile data).
+                    @if ($playMode === 'testing')
+                        Need to be added as a tester? <a href="{{ route('contact') }}" class="font-medium text-indigo-600 hover:text-indigo-500">Contact us</a>.
+                    @endif
                 </p>
             </div>
 

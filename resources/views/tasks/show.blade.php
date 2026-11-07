@@ -44,6 +44,69 @@
                     <div class="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-600">{{ $task->description }}</div>
                 @endif
             </div>
+
+            {{-- Site photos (from the Android app or added here) --}}
+            <div id="photos" class="rounded-xl border border-slate-200 bg-white p-6">
+                <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="font-semibold text-slate-900">Site photos <span class="font-normal text-slate-400">({{ $task->photos->count() }})</span></h3>
+                </div>
+
+                @if ($task->photos->isEmpty())
+                    <p class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
+                        No photos yet. Site staff can add them from the Android app on this task.
+                    </p>
+                @else
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        @foreach ($task->photos as $photo)
+                            <figure class="group overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                                <a href="{{ route('task-photos.file', $photo) }}" target="_blank" rel="noopener" class="block aspect-[4/3] overflow-hidden bg-slate-100"
+                                   data-photo-full="{{ route('task-photos.file', $photo) }}" data-photo-caption="{{ $photo->caption }}">
+                                    <img src="{{ route('task-photos.file', ['photo' => $photo, 'size' => 'thumb']) }}" alt="{{ $photo->caption ?: 'Site photo' }}" loading="lazy"
+                                         class="h-full w-full object-cover transition group-hover:scale-105">
+                                </a>
+                                <figcaption class="px-2.5 py-2 text-xs">
+                                    @if ($photo->caption)
+                                        <p class="mb-0.5 line-clamp-2 font-medium text-slate-800">{{ $photo->caption }}</p>
+                                    @endif
+                                    <div class="flex items-center justify-between gap-2 text-slate-500">
+                                        <span class="truncate">{{ $photo->user?->name ?? 'Removed user' }} · {{ ($photo->taken_at ?? $photo->created_at)?->format('d M, H:i') }}</span>
+                                        @if ($photo->canBeDeletedBy(auth()->user()))
+                                            <form method="POST" action="{{ route('task-photos.destroy', $photo) }}" onsubmit="return confirm('Delete this photo?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-rose-600 hover:text-rose-700">Delete</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </figcaption>
+                            </figure>
+                        @endforeach
+                    </div>
+                @endif
+
+                @can('update', $task)
+                    <form method="POST" action="{{ route('tasks.photos.store', $task) }}" enctype="multipart/form-data" class="mt-5 border-t border-slate-100 pt-4">
+                        @csrf
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                            <label class="block flex-1">
+                                <span class="text-sm font-medium text-slate-700">Add photos</span>
+                                <input type="file" name="photos[]" multiple required accept="image/jpeg,image/png,image/webp"
+                                       class="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100">
+                            </label>
+                            <label class="block flex-1">
+                                <span class="text-sm font-medium text-slate-700">Caption <span class="text-slate-400">(optional)</span></span>
+                                <input type="text" name="caption" maxlength="255" value="{{ old('caption') }}" placeholder="e.g. Column C-4 shuttering done"
+                                       class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            </label>
+                            <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Upload</button>
+                        </div>
+                        @error('photos')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        @error('photos.*')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        @error('photo')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        <p class="mt-2 text-xs text-slate-400">JPG, PNG, or WebP, up to 10 at a time. Photos are resized and kept private to your company.</p>
+                    </form>
+                @endcan
+            </div>
         </div>
 
         <div class="space-y-6">

@@ -72,29 +72,61 @@ class ApiClient {
     return _send('PATCH', path, body: body);
   }
 
+  Future<dynamic> delete(String path) {
+    return _send('DELETE', path);
+  }
+
+  /// POST a file as multipart/form-data (e.g. a site photo).
+  Future<dynamic> upload(
+    String path, {
+    required String field,
+    required String filePath,
+    Map<String, String> fields = const {},
+  }) async {
+    final request = http.MultipartRequest('POST', Uri.parse('${AppConfig.apiBaseUrl}$path'))
+      ..headers.addAll({
+        'Accept': 'application/json',
+        if (_token != null) 'Authorization': 'Bearer $_token',
+      })
+      ..fields.addAll(fields)
+      ..files.add(await http.MultipartFile.fromPath(field, filePath));
+
+    return _dispatch(request, timeout: const Duration(seconds: 90));
+  }
+
+  /// Headers for loading protected images with [Image.network].
+  Map<String, String> get imageHeaders => {
+        if (_token != null) 'Authorization': 'Bearer $_token',
+      };
+
   Future<dynamic> _send(
     String method,
     String path, {
     Object? body,
     Map<String, String>? query,
-  }) async {
+  }) {
     final uri = Uri.parse('${AppConfig.apiBaseUrl}$path').replace(
       queryParameters: query,
     );
 
-    final headers = <String, String>{
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      if (_token != null) 'Authorization': 'Bearer $_token',
-    };
+    final request = http.Request(method, uri)
+      ..headers.addAll({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        if (_token != null) 'Authorization': 'Bearer $_token',
+      });
+    if (body != null) request.body = jsonEncode(body);
 
+    return _dispatch(request);
+  }
+
+  Future<dynamic> _dispatch(
+    http.BaseRequest request, {
+    Duration timeout = const Duration(seconds: 20),
+  }) async {
     http.Response res;
     try {
-      final request = http.Request(method, uri)..headers.addAll(headers);
-      if (body != null) request.body = jsonEncode(body);
-      final streamed = await _http
-          .send(request)
-          .timeout(const Duration(seconds: 20));
+      final streamed = await _http.send(request).timeout(timeout);
       res = await http.Response.fromStream(streamed);
     } on TimeoutException {
       throw ApiException(

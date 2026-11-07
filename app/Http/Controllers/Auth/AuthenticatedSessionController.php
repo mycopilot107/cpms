@@ -26,7 +26,7 @@ class AuthenticatedSessionController extends Controller
         // login instead of being sent to a tenant dashboard. An explicit
         // intended URL still wins, so normal deep-link login continues to work.
         $defaultRoute = $request->user()->isSuperAdmin()
-            ? route('platform.companies.index')
+            ? route('platform.overview')
             : route('dashboard');
 
         return redirect()->intended($defaultRoute);

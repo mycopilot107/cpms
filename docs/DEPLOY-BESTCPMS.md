@@ -15,12 +15,11 @@ repo; the steps below are what you do on the server to make them live.
   URLs all derive from `APP_URL`, so they follow automatically.
 - **App name** default is now `Best CPMS` (`config/app.php`), so the mail
   "from" name and other framework uses of the app name are branded.
-- **APK** is served to users as `BestCPMS-Field.apk` (the on-disk file stays
-  `public/downloads/cpms-field-app.apk`).
+- **Android app** is installed from Google Play only (see
+  `docs/MOBILE-BUILD.md`); the site links to it and serves no APK.
 
 Code identifiers were deliberately **left unchanged** so nothing breaks: the
-Flutter package id `cpms_mobile`, the `cpms_currency` cookie key, and the
-`cpms-field-app.apk` build artifact name.
+Flutter package id `cpms_mobile` and the `cpms_currency` cookie key.
 
 ## Server setup (do once when you deploy)
 
@@ -76,19 +75,12 @@ apex (or vice-versa) so you have one canonical host.
 - Optional brand/SEO overrides (`SEO_SITE_NAME`, `SEO_TAGLINE`, …) are
   documented in `.env.example`.
 
-### 6. Mobile app (only if you distribute the APK)
+### 6. Mobile app (Google Play)
 
-Rebuild the field app pointing at the live API, then it is served from
-`/get-the-app`:
-
-```sh
-cd mobile
-./build_apk.sh https://bestcpms.com/api      # macOS / Linux
-build_apk.bat https://bestcpms.com/api       # Windows
-```
-
-Running over HTTPS also avoids the cleartext-HTTP caveat described in
-`docs/MOBILE-BUILD.md`.
+Build the signed bundle with `mobile/build_play_bundle.sh`, upload it in Play
+Console, and set `PLAY_TESTING_URL` (internal testing) or `PLAY_STORE_URL`
+(public) in the server `.env`. Full steps: `docs/MOBILE-BUILD.md`. Delete any
+old `public/downloads/` folder on the server so no APK stays downloadable.
 
 ## Follow-up: social share image
 

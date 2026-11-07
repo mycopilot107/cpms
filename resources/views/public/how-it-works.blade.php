@@ -33,7 +33,7 @@
     ];
 
     $steps = [
-        ['Register the company', 'The person who signs up becomes the Owner. The company starts a '.\App\Models\Company::TRIAL_DAYS.'-day free trial with no card.'],
+        ['Register the company', 'The person who signs up becomes the Owner. The free trial needs no card and lasts at least '.\App\Models\Company::TRIAL_DAYS.' days — always past your first month-end report.'],
         ['Add the team', 'The owner opens Team, adds each person with an email and password, and picks their role. That person signs in with those details.'],
         ['Create projects and tasks', 'The owner or a project manager creates the project. A project manager or supervisor adds milestones and dated tasks, and assigns each task to someone.'],
         ['Report from site', 'Engineers and site workers open the Android app or the website, see the tasks assigned to them, and update status, percent complete, and hours.'],

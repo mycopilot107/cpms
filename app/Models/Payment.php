@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToCompany;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,10 +17,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Payment extends Model
 {
-    use HasFactory, BelongsToCompany;
+    use BelongsToCompany, HasFactory;
 
     public const STATUS_CREATED = 'created';
+
     public const STATUS_PAID = 'paid';
+
     public const STATUS_FAILED = 'failed';
 
     /**
@@ -90,5 +93,16 @@ class Payment extends Model
     public function isPaid(): bool
     {
         return $this->status === self::STATUS_PAID;
+    }
+
+    /**
+     * Every company's payments, for the platform console. Bypasses the tenant
+     * scope, so only call this behind the super-admin gate.
+     *
+     * @return Builder<self>
+     */
+    public static function acrossCompanies(): Builder
+    {
+        return static::query()->withoutGlobalScope('company');
     }
 }

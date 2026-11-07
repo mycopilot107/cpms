@@ -19,7 +19,7 @@ use Illuminate\View\View;
  */
 class SendEmailController extends Controller
 {
-    private const DEFAULT_SUBJECT = 'Run every construction site from one place — Best CPMS (15-day free trial)';
+    private const DEFAULT_SUBJECT = 'Run every construction site from one place — Best CPMS (30-day free trial)';
 
     private const DEFAULT_BODY = <<<'HTML'
 <p>Dear Sir/Madam,</p>
@@ -37,7 +37,9 @@ class SendEmailController extends Controller
 <li>Give each person a role, so site staff see tasks and the office sees cost</li>
 </ul>
 
-<h3>Start a 15-day free trial — no card needed</h3>
+<h3>Free trial through your first month-end — no card needed</h3>
+
+<p>The trial lasts at least 30 days and always runs past one month-end, so you can close a full billing cycle in Best CPMS before you decide.</p>
 
 <p>Set up your first project in an afternoon:<br>
 <a href="https://bestcpms.com">https://bestcpms.com</a></p>

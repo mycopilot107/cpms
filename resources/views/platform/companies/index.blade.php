@@ -23,9 +23,12 @@
 
 <div class="mx-auto max-w-6xl px-4 py-8 sm:px-0">
 
-    <header class="mb-6">
-        <h1 class="font-display text-2xl font-bold text-slate-900">Platform console</h1>
-        <p class="mt-1 text-sm text-slate-600">Every company on Best CPMS and when its access expires. Read-only.</p>
+    <header class="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+            <h1 class="font-display text-2xl font-bold text-slate-900">Platform console</h1>
+            <p class="mt-1 text-sm text-slate-600">Every company on Best CPMS and when its access expires.</p>
+        </div>
+        <a href="{{ route('platform.companies.create') }}" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Add company</a>
     </header>
 
     {{-- Summary --}}
@@ -83,7 +86,7 @@
                         <th class="px-4 py-3">Users</th>
                         <th class="px-4 py-3">Access</th>
                         <th class="px-4 py-3">Expiry</th>
-                        <th class="px-4 py-3"><span class="sr-only">View</span></th>
+                        <th class="px-4 py-3"><span class="sr-only">Actions</span></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -118,6 +121,7 @@
                             </td>
                             <td class="px-4 py-3 text-right">
                                 <a href="{{ route('platform.companies.show', $company) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View</a>
+                                <a href="{{ route('platform.companies.edit', $company) }}" class="ml-3 text-sm font-medium text-slate-600 hover:text-slate-900">Edit</a>
                             </td>
                         </tr>
                     @endforeach

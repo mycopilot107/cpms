@@ -70,7 +70,7 @@ class TaskController extends Controller
     {
         $this->authorize('view', $task);
 
-        $task->load(['project', 'assignee', 'creator', 'dependency']);
+        $task->load(['project', 'assignee', 'creator', 'dependency', 'photos.user']);
 
         return view('tasks.show', ['task' => $task]);
     }

@@ -18,8 +18,15 @@
         if ($isSuperAdmin) {
             // Super admins use the platform console only. Do not expose tenant
             // navigation such as Dashboard, Projects, Billing, or Team.
+            $unreadMessages = \App\Models\ContactMessage::query()->whereNull('read_at')->count();
             $navItems = [
-                ['url' => route('platform.companies.index'), 'label' => 'Companies', 'active' => request()->routeIs('platform.*')],
+                ['url' => route('platform.overview'), 'label' => 'Overview', 'active' => request()->routeIs('platform.overview')],
+                ['url' => route('platform.companies.index'), 'label' => 'Companies', 'active' => request()->routeIs('platform.companies.*')],
+                ['url' => route('platform.payments.index'), 'label' => 'Payments', 'active' => request()->routeIs('platform.payments.*')],
+                ['url' => route('platform.users.index'), 'label' => 'Users', 'active' => request()->routeIs('platform.users.*')],
+                ['url' => route('platform.messages.index'), 'label' => 'Messages'.($unreadMessages ? " ({$unreadMessages})" : ''), 'active' => request()->routeIs('platform.messages.*')],
+                ['url' => route('platform.smtp-test'), 'label' => 'SMTP test', 'active' => request()->routeIs('platform.smtp-test*')],
+                ['url' => route('admin.send-email.index'), 'label' => 'Send email', 'active' => false],
             ];
         } else {
             $navItems = [
@@ -31,6 +38,7 @@
             // Planning (calendar / Gantt / milestones) is available to every active member.
             if ($user?->isActive()) {
                 $navItems[] = ['url' => route('planning.calendar'), 'label' => 'Planning', 'active' => request()->routeIs('planning.*') || request()->routeIs('milestones.*')];
+                $navItems[] = ['url' => route('daily-reports.index'), 'label' => 'Daily reports', 'active' => request()->routeIs('daily-reports.*')];
             }
 
             // Finance + Reports are limited to finance/report roles.
@@ -61,7 +69,7 @@
         <div class="mx-auto max-w-7xl px-4">
             <div class="flex h-16 items-center justify-between">
                 <div class="flex items-center gap-8">
-                    <a href="{{ $isSuperAdmin ? route('platform.companies.index') : route('dashboard') }}" class="flex items-center gap-2 text-lg font-bold text-white">
+                    <a href="{{ $isSuperAdmin ? route('platform.overview') : route('dashboard') }}" class="flex items-center gap-2 text-lg font-bold text-white">
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-white">C</span>
                         Best CPMS
                     </a>
@@ -76,12 +84,12 @@
                         <div class="text-sm font-medium text-white">{{ auth()->user()?->name }}</div>
                         <div class="text-xs text-slate-400">{{ $company?->name }} · {{ auth()->user()?->role?->name }}</div>
                     </div>
+                    <a href="{{ route('account.profile') }}" class="hidden rounded-md px-2 py-1.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white md:block {{ request()->routeIs('account.*') ? 'bg-slate-800 text-white' : '' }}">My account</a>
                     <form method="POST" action="{{ route('logout') }}" class="hidden md:block">
                         @csrf
                         <button type="submit" class="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800">Log out</button>
                     </form>
                      <button type="button" id="mobile-menu-button" aria-controls="mobile-menu" aria-expanded="false"
-                             @if ($isSuperAdmin) hidden @endif
                             class="inline-flex items-center justify-center rounded-md p-2 text-slate-300 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 md:hidden">
                         <span class="sr-only">Toggle navigation menu</span>
                         <svg id="mobile-menu-open" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -104,7 +112,9 @@
             <div class="border-t border-slate-800 px-4 py-3">
                 <div class="text-sm font-medium text-white">{{ auth()->user()?->name }}</div>
                 <div class="text-xs text-slate-400">{{ $company?->name }} · {{ auth()->user()?->role?->name }}</div>
-                <form method="POST" action="{{ route('logout') }}" class="mt-3">
+                <a href="{{ route('account.profile') }}" class="mt-3 block rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">My account</a>
+                <a href="{{ route('account.password') }}" class="block rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">Change password</a>
+                <form method="POST" action="{{ route('logout') }}" class="mt-2">
                     @csrf
                     <button type="submit" class="w-full rounded-md border border-slate-700 px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800">Log out</button>
                 </form>
@@ -115,7 +125,7 @@
     @php $activeSub = $company?->activeSubscription(); @endphp
     @if (! $isSuperAdmin && $company && $company->isOnTrial() && ! $activeSub)
         <div class="border-b border-amber-200 bg-amber-50 py-2 text-center text-sm text-amber-800">
-            You're on a free trial — <span class="font-semibold">{{ $company->trialDaysRemaining() }}</span> day(s) remaining.
+            You're on a free trial until <span class="font-semibold">{{ $company->trial_ends_at->format('j M Y') }}</span> — {{ $company->trialDaysRemaining() }} day(s) left, enough to close your month-end.
         </div>
     @elseif (! $isSuperAdmin && $company && $company->trialExpired() && ! $activeSub)
         <div class="border-b border-red-200 bg-red-50 py-2 text-center text-sm text-red-800">

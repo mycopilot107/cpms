@@ -6,14 +6,18 @@ use App\Models\Concerns\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Task extends Model
 {
-    use HasFactory, BelongsToCompany;
+    use BelongsToCompany, HasFactory;
 
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_IN_PROGRESS = 'in_progress';
+
     public const STATUS_COMPLETED = 'completed';
+
     public const STATUS_CANCELLED = 'cancelled';
 
     public const STATUSES = [
@@ -24,8 +28,11 @@ class Task extends Model
     ];
 
     public const PRIORITY_LOW = 'low';
+
     public const PRIORITY_MEDIUM = 'medium';
+
     public const PRIORITY_HIGH = 'high';
+
     public const PRIORITY_URGENT = 'urgent';
 
     public const PRIORITIES = [
@@ -63,7 +70,25 @@ class Task extends Model
         'progress' => 'integer',
         'estimated_hours' => 'decimal:2',
         'actual_hours' => 'decimal:2',
+        'completed_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        // Stamp the moment the task becomes completed (web or app), and clear
+        // it if the task is reopened.
+        static::saving(function (Task $task): void {
+            if (! $task->isDirty('status')) {
+                return;
+            }
+
+            if ($task->status === self::STATUS_COMPLETED) {
+                $task->completed_at ??= now();
+            } else {
+                $task->completed_at = null;
+            }
+        });
+    }
 
     public function project(): BelongsTo
     {
@@ -73,6 +98,11 @@ class Task extends Model
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function photos(): HasMany
+    {
+        return $this->hasMany(TaskPhoto::class)->latest();
     }
 
     public function creator(): BelongsTo

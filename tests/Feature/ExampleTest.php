@@ -17,12 +17,12 @@ class ExampleTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_login_page_labels_the_android_app_download(): void
+    public function test_login_page_labels_the_android_app_link(): void
     {
         $this->get('/login')
             ->assertOk()
-            ->assertSee('Download the Android app', false)
-            ->assertSee('For Android phones', false)
-            ->assertSee('aria-label="Download the Best CPMS Android app"', false);
+            ->assertSee('Get the Android app', false)
+            ->assertSee('On Google Play', false)
+            ->assertSee('aria-label="Get the Best CPMS Android app on Google Play"', false);
     }
 }

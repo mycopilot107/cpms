@@ -4,7 +4,7 @@
 
 @section('content')
     <h1 class="mb-1 text-lg font-semibold text-slate-900">Start your free trial</h1>
-    <p class="mb-6 text-sm text-slate-500">15 days free. No credit card required.</p>
+    <p class="mb-6 text-sm text-slate-500">Free until {{ \App\Models\Company::trialEndsAt(now())->format('j M') }} — at least {{ \App\Models\Company::TRIAL_DAYS }} days and through your first month-end report. No credit card required.</p>
 
     <form method="POST" action="{{ route('register.store') }}" class="space-y-5">
         @csrf
