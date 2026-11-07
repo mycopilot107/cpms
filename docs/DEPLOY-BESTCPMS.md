@@ -15,8 +15,8 @@ repo; the steps below are what you do on the server to make them live.
   URLs all derive from `APP_URL`, so they follow automatically.
 - **App name** default is now `Best CPMS` (`config/app.php`), so the mail
   "from" name and other framework uses of the app name are branded.
-- **Android app** is installed from Google Play only (see
-  `docs/MOBILE-BUILD.md`); the site links to it and serves no APK.
+- **Android app** is installed from Google Play or as a direct APK from
+  `storage/app/downloads/best-cpms-field.apk` (see `docs/MOBILE-BUILD.md`).
 
 Code identifiers were deliberately **left unchanged** so nothing breaks: the
 Flutter package id `cpms_mobile` and the `cpms_currency` cookie key.
@@ -79,8 +79,10 @@ apex (or vice-versa) so you have one canonical host.
 
 Build the signed bundle with `mobile/build_play_bundle.sh`, upload it in Play
 Console, and set `PLAY_TESTING_URL` (internal testing) or `PLAY_STORE_URL`
-(public) in the server `.env`. Full steps: `docs/MOBILE-BUILD.md`. Delete any
-old `public/downloads/` folder on the server so no APK stays downloadable.
+(public) in the server `.env`. For the direct download, run
+`mobile/build_apk.sh` and upload `storage/app/downloads/best-cpms-field.apk` to
+the same path on the server. Full steps: `docs/MOBILE-BUILD.md`. Delete any old
+`public/downloads/` folder on the server.
 
 ## Follow-up: social share image
 

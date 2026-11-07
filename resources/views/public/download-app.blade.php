@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Get the Best CPMS field app for Android')
-@section('meta_description', 'Get the Best CPMS field app for Android on Google Play. Site staff see their tasks, file the daily site report, and send photos from site.')
+@section('meta_description', 'Get the Best CPMS field app for Android on Google Play or as a direct APK download. Site staff see their tasks, file the daily site report, and send photos from site.')
 @section('meta_keywords', 'construction field app, construction site app android, best cpms mobile app download, construction task app, site progress app')
 
 @section('content')
@@ -30,7 +30,7 @@
                         Reporting falls apart when the people closest to the work can't easily record it. The app is deliberately small and fast: open it, update a task, carry on. Everything syncs to the same account your office team uses on the web.
                     </p>
 
-                    <div class="mt-8">
+                    <div class="mt-8 flex flex-wrap items-center gap-3">
                         @if ($playUrl)
                             <a href="{{ $playUrl }}" target="_blank" rel="noopener"
                                class="inline-flex items-center gap-3 rounded-lg bg-slate-900 px-5 py-3 text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
@@ -45,17 +45,37 @@
                                     <span class="block text-lg font-semibold">Google Play</span>
                                 </span>
                             </a>
-                            <p class="mt-3 text-sm text-slate-500">
-                                Installs and updates through the Play Store — no settings to change.
-                            </p>
-                        @else
+                        @endif
+
+                        @if ($apkAvailable)
+                            <a href="{{ route('app.download') }}" download
+                               class="inline-flex items-center gap-3 rounded-lg bg-[#3DDC84] px-5 py-3 text-slate-900 shadow-sm transition hover:bg-[#32c574] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                                @include('partials.android-icon', ['class' => 'h-7 w-7'])
+                                <span class="text-left leading-tight">
+                                    <span class="block text-[11px] uppercase tracking-wide text-slate-700">Direct download · {{ $apkSizeMb }} MB</span>
+                                    <span class="block text-lg font-semibold">Download APK</span>
+                                </span>
+                            </a>
+                        @endif
+
+                        @if (! $playUrl && ! $apkAvailable)
                             <span class="inline-flex items-center gap-3 rounded-md border border-slate-300 bg-slate-100 px-6 py-3 font-semibold text-slate-400">
                                 @include('partials.android-icon', ['class' => 'h-6 w-6'])
                                 Coming soon to Google Play
                             </span>
-                            <p class="mt-3 text-sm text-slate-500">The Google Play link will appear here as soon as the app is published.</p>
                         @endif
                     </div>
+                    <p class="mt-3 text-sm text-slate-500">
+                        @if ($playUrl && $apkAvailable)
+                            Google Play installs and updates the app for you. No Play Store on the phone? Download the APK instead.
+                        @elseif ($playUrl)
+                            Installs and updates through the Play Store — no settings to change.
+                        @elseif ($apkAvailable)
+                            Download the APK straight to your phone. Google Play is coming soon.
+                        @else
+                            The Google Play link will appear here as soon as the app is published.
+                        @endif
+                    </p>
 
                     <p class="mt-6 text-sm text-slate-500">
                         On an iPhone or a desktop? The <a href="{{ route('login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">web app</a> is fully responsive and works in any browser — the Android app is an extra convenience for field teams, not a requirement.
@@ -119,30 +139,52 @@
                         ['Install', 'Tap Install. Updates arrive through the Play Store automatically.'],
                         ['Sign in', 'Open Best CPMS Field and sign in with the same email and password you use on the web.'],
                     ];
+                $apkSteps = [
+                    ['Download the APK', 'Tap “Download APK” above on your phone and wait for the download to finish.'],
+                    ['Open the file and allow the install', 'Open BestCPMS-Field.apk from the notification or your Downloads. The first time, Android asks you to allow installs from your browser — tap Settings, turn on “Allow from this source”, then go back and tap Install.'],
+                    ['Sign in', 'Open Best CPMS Field and sign in with the same email and password you use on the web. For a new version, download the APK again and install it over the old one.'],
+                ];
+                $installGuides = array_values(array_filter([
+                    ($playUrl || ! $apkAvailable) ? [
+                        'title' => 'Installing from Google Play',
+                        'intro' => 'The app comes from Google Play, so there is nothing to allow in your phone’s settings.',
+                        'steps' => $steps,
+                    ] : null,
+                    $apkAvailable ? [
+                        'title' => 'Installing the APK',
+                        'intro' => 'For phones without Google Play, or when you need the app right now.',
+                        'steps' => $apkSteps,
+                    ] : null,
+                ]));
             @endphp
-            <div class="mt-12 rounded-xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
-                <h2 class="font-display font-semibold text-slate-900">Installing on Android</h2>
-                <p class="mt-2 text-sm text-slate-600">
-                    The app comes from Google Play, so there is nothing to allow in your phone's settings.
-                </p>
-                <ol class="mt-5 space-y-4">
-                    @foreach ($steps as $i => $step)
-                        <li class="flex gap-4">
-                            <span class="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">{{ $i + 1 }}</span>
-                            <div>
-                                <p class="font-medium text-slate-900">{{ $step[0] }}</p>
-                                <p class="mt-0.5 text-sm text-slate-600">{{ $step[1] }}</p>
-                            </div>
-                        </li>
-                    @endforeach
-                </ol>
-                <p class="mt-6 text-xs text-slate-500">
-                    Requires Android 7.0 or newer and an internet connection (Wi-Fi or mobile data).
-                    @if ($playMode === 'testing')
-                        Need to be added as a tester? <a href="{{ route('contact') }}" class="font-medium text-indigo-600 hover:text-indigo-500">Contact us</a>.
-                    @endif
-                </p>
+            <div class="mt-12 grid gap-6 {{ count($installGuides) > 1 ? 'lg:grid-cols-2' : '' }}">
+                @foreach ($installGuides as $guide)
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+                        <h2 class="font-display font-semibold text-slate-900">{{ $guide['title'] }}</h2>
+                        <p class="mt-2 text-sm text-slate-600">{{ $guide['intro'] }}</p>
+                        <ol class="mt-5 space-y-4">
+                            @foreach ($guide['steps'] as $i => $step)
+                                <li class="flex gap-4">
+                                    <span class="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">{{ $i + 1 }}</span>
+                                    <div>
+                                        <p class="font-medium text-slate-900">{{ $step[0] }}</p>
+                                        <p class="mt-0.5 text-sm text-slate-600">{{ $step[1] }}</p>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ol>
+                    </div>
+                @endforeach
             </div>
+            <p class="mt-6 text-xs text-slate-500">
+                Requires Android 7.0 or newer and an internet connection (Wi-Fi or mobile data).
+                @if ($playUrl && $apkAvailable)
+                    The Play Store version and the APK can’t update each other — to switch, uninstall the app first.
+                @endif
+                @if ($playMode === 'testing')
+                    Need to be added as a tester? <a href="{{ route('contact') }}" class="font-medium text-indigo-600 hover:text-indigo-500">Contact us</a>.
+                @endif
+            </p>
 
         </div>
     </section>

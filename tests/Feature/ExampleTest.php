@@ -22,7 +22,7 @@ class ExampleTest extends TestCase
         $this->get('/login')
             ->assertOk()
             ->assertSee('Get the Android app', false)
-            ->assertSee('On Google Play', false)
-            ->assertSee('aria-label="Get the Best CPMS Android app on Google Play"', false);
+            ->assertSee('Google Play or APK download', false)
+            ->assertSee('aria-label="Get the Best CPMS Android app"', false);
     }
 }

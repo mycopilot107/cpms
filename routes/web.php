@@ -91,8 +91,8 @@ foreach (array_keys(config('landing.pages', [])) as $landingKey) {
         ->name('landing.'.$landingKey);
 }
 
-// Mobile app — public landing page with the Google Play link. The old
-// /download/android URL redirects to Google Play; no APK is served.
+// Mobile app — public landing page with the Google Play link and the direct
+// APK download (/download/android, which falls back to Google Play).
 Route::get('get-the-app', [DownloadController::class, 'app'])->name('app.download-page');
 Route::get('download/android', [DownloadController::class, 'android'])->name('app.download');
 

@@ -1,9 +1,16 @@
 # Building & distributing the Best CPMS field app
 
-The Android app is distributed through **Google Play only** — internal testing
-first, production later. The website no longer serves an APK, so nobody has to
-allow "unknown sources", and Play delivers a download of about 9 MB per phone
-instead of a 50 MB universal APK.
+The Android app is distributed two ways, both shown on `/get-the-app`:
+
+- **Google Play** (internal testing first, production later): about 9 MB per
+  phone, updates automatically, nothing to allow in phone settings.
+- **Direct APK** (about 16 MB) for phones without Play access. Build it with
+  `./build_apk.sh`; it lands in `storage/app/downloads/best-cpms-field.apk`
+  (outside `public/`) and is streamed by `/download/android`. Copy that file to
+  the same path on the server — the button appears once the file exists.
+
+An APK install and a Play install are signed differently (Play re-signs with
+Google's key), so they can't update each other; switching needs an uninstall.
 
 For running the app on an emulator during development, see
 [`docs/MOBILE.md`](MOBILE.md).
@@ -81,7 +88,7 @@ bundle is uploaded.
 |-------|-------|
 | Play links (`PLAY_STORE_URL`, `PLAY_TESTING_URL`) | `config/mobile.php` |
 | Landing page with the Google Play button | `GET /get-the-app` → `resources/views/public/download-app.blade.php` |
-| Old shared links | `GET /download/android` redirects to Google Play |
+| APK download | `GET /download/android` streams the APK (redirects to Google Play when no APK is deployed) |
 | "Get the Android app" row on login/register | `resources/views/auth/partials/app-download.blade.php` |
 | Controller | `app/Http/Controllers/DownloadController.php` |
 

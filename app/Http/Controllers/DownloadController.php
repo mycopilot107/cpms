@@ -4,37 +4,58 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
- * The Best CPMS field app is installed from Google Play — the public listing
- * once it is live, or the internal-testing link while it is being tested.
- * The site never serves an APK, so no one is asked to allow "unknown sources".
+ * The Best CPMS field app can be installed two ways: from Google Play (the
+ * public listing, or the internal-testing link while it is being tested), or
+ * as a direct APK download for phones without Play access.
  */
 class DownloadController extends Controller
 {
-    /** Public landing page describing the app, with the Google Play button. */
+    /** Public landing page describing the app, with the install buttons. */
     public function app(): View
     {
         [$url, $mode] = $this->playLink();
+        $apkPath = $this->apkPath();
 
         return view('public.download-app', [
             'playUrl' => $url,
             'playMode' => $mode,
+            'apkAvailable' => $apkPath !== null,
+            'apkSizeMb' => $apkPath !== null ? round(filesize($apkPath) / 1048576, 1) : null,
         ]);
     }
 
-    /** Old /download/android links (shared before) now go to Google Play. */
-    public function android(): RedirectResponse
+    /** Streams the APK, or falls back to Google Play when no APK is deployed. */
+    public function android(): BinaryFileResponse|RedirectResponse
     {
+        $apkPath = $this->apkPath();
+
+        if ($apkPath !== null) {
+            return response()->download($apkPath, config('mobile.apk_download_name'), [
+                'Content-Type' => 'application/vnd.android.package-archive',
+                'Cache-Control' => 'no-cache',
+                'X-Robots-Tag' => 'noindex',
+            ]);
+        }
+
         [$url] = $this->playLink();
 
         if ($url === null) {
             return redirect()
                 ->route('app.download-page')
-                ->with('status', 'The Android app is not on Google Play yet. Please check back shortly.');
+                ->with('status', 'The Android app is not available for download yet. Please check back shortly.');
         }
 
         return redirect()->away($url);
+    }
+
+    private function apkPath(): ?string
+    {
+        $path = config('mobile.apk_path');
+
+        return is_string($path) && is_file($path) ? $path : null;
     }
 
     /**

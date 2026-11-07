@@ -4,6 +4,9 @@
     php_value upload_max_filesize 16M
     php_value post_max_size 40M
     php_value max_file_uploads 20
+    # Apache workers may be denied executable memory; without this every
+    # preg_* call raises a JIT warning that Laravel turns into a 500.
+    php_flag pcre.jit off
 </IfModule>
 
 <IfModule mod_rewrite.c>
