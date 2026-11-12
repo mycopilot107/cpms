@@ -24,8 +24,11 @@
 
         <div>
             <label for="phone" class="block text-sm font-medium text-slate-700">Phone</label>
-            <input id="phone" name="phone" type="text" value="{{ old('phone', $user->phone ?? '') }}"
-                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <input id="phone" name="phone" type="text" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" placeholder="10-digit number"
+                   value="{{ old('phone', \App\Support\Phone::normalize($user->phone ?? null) ?? '') }}"
+                   oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
+                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('phone') border-red-400 @enderror">
+            @error('phone')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
         </div>
 
         <div>
@@ -37,7 +40,7 @@
             @else
                 <select id="role" name="role" class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     @foreach ($roles as $role)
-                        <option value="{{ $role->slug }}" @selected(old('role', $user?->role?->slug ?? 'worker') === $role->slug)>{{ $role->name }}</option>
+                        <option value="{{ $role->id }}" @selected((string) old('role', $user?->role_id) === (string) $role->id)>{{ $role->name }}</option>
                     @endforeach
                 </select>
             @endif

@@ -64,6 +64,7 @@ class PageController extends Controller
     {
         return view('public.features', [
             'roles' => Role::query()
+                ->whereNull('company_id')
                 ->where('slug', '!=', User::ROLE_ADMIN)
                 ->orderBy('sort_order')
                 ->get(),
@@ -141,6 +142,7 @@ class PageController extends Controller
     {
         return view('public.how-it-works', [
             'roles' => Role::query()
+                ->whereNull('company_id')
                 ->where('slug', '!=', User::ROLE_ADMIN)
                 ->orderBy('sort_order')
                 ->get(),

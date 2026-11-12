@@ -58,7 +58,7 @@ class RazorpayService
     public function createOrder(int $amountInPaise, string $currency, string $receipt, array $notes = []): array
     {
         if (! $this->configured()) {
-            throw new RuntimeException('Razorpay is not configured. Set RAZORPAY_KEY and RAZORPAY_SECRET.');
+            throw new RuntimeException('Razorpay is not configured. Set RAZORPAY_KEY (or RAZORPAY_KEY_ID) and RAZORPAY_SECRET.');
         }
 
         $response = Http::withBasicAuth($this->keyId, $this->keySecret)

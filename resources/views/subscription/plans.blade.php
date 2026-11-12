@@ -48,7 +48,7 @@
             @unless ($gatewayReady)
                 <div class="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                     Online payment isn't configured yet. Ask your administrator to add the Razorpay keys
-                    (<code>RAZORPAY_KEY</code> / <code>RAZORPAY_SECRET</code>) before purchasing.
+                    (<code>RAZORPAY_KEY</code> or <code>RAZORPAY_KEY_ID</code>, and <code>RAZORPAY_SECRET</code>) before purchasing.
                 </div>
             @endunless
 

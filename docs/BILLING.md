@@ -68,6 +68,9 @@ unchanged: it is recomputed server-side from the INR `price_per_user`.
    ```
    RAZORPAY_KEY=rzp_test_xxxxxxxxxxxxx
    RAZORPAY_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx
+
+   `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` (the names on Razorpay's
+   dashboard) are accepted as aliases.
    ```
 
 3. Run the new migrations:

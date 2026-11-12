@@ -32,9 +32,12 @@
         </div>
 
         <div>
-            <label for="phone" class="block text-sm font-medium text-slate-700">Phone <span class="text-slate-400">(optional)</span></label>
-            <input id="phone" name="phone" type="text" value="{{ old('phone') }}"
-                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <label for="phone" class="block text-sm font-medium text-slate-700">Phone <span class="text-slate-400">(optional, 10 digits)</span></label>
+            <input id="phone" name="phone" type="text" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" placeholder="10-digit number"
+                   value="{{ old('phone') }}"
+                   oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
+                   class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('phone') border-red-400 @enderror">
+            @error('phone')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
         </div>
 
         @include('partials.country-currency-fields', ['detect' => true])

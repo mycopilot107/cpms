@@ -80,15 +80,15 @@
         var q = document.getElementById('quantity');
         var r = document.getElementById('rate');
         var out = document.getElementById('boq-amount');
-        var symbol = @json(\App\Support\Money::symbol());
+        var code = @json(\App\Support\Money::code());
         var locale = @json(\App\Support\Money::locale());
         if (!q || !r || !out) return;
         function recalc() {
             var amt = (parseFloat(q.value) || 0) * (parseFloat(r.value) || 0);
             var text;
-            try { text = amt.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-            catch (e) { text = amt.toFixed(2); }
-            out.textContent = symbol + text;
+            try { text = Math.abs(amt).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+            catch (e) { text = Math.abs(amt).toFixed(2); }
+            out.textContent = (amt < 0 ? '-' : '') + code + ' ' + text;
         }
         q.addEventListener('input', recalc);
         r.addEventListener('input', recalc);

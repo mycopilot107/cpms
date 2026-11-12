@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\Phone;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +20,10 @@ class UpdateAccountProfileRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge(['email' => strtolower(trim((string) $this->input('email')))]);
+        $this->merge([
+            'email' => strtolower(trim((string) $this->input('email'))),
+            'phone' => Phone::normalize($this->input('phone')),
+        ]);
     }
 
     /**
@@ -34,7 +38,7 @@ class UpdateAccountProfileRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'phone' => ['nullable', 'string', 'max:30'],
+            'phone' => Phone::rules(),
             'current_password' => $needsPassword ? ['required', 'string', 'current_password:web'] : ['nullable'],
         ];
     }
@@ -47,6 +51,7 @@ class UpdateAccountProfileRequest extends FormRequest
         return [
             'current_password.required' => 'Enter your current password to change your email.',
             'current_password.current_password' => 'Your current password is not correct.',
+            'phone.digits' => 'The phone number must be 10 digits.',
         ];
     }
 }

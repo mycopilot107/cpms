@@ -41,8 +41,10 @@ return [
      | commit real keys to source control.
      */
     'razorpay' => [
-        'key' => env('RAZORPAY_KEY'),
-        'secret' => env('RAZORPAY_SECRET'),
+        // Razorpay's dashboard labels these Key Id and Key Secret, so either
+        // name is accepted. An empty RAZORPAY_KEY must not hide RAZORPAY_KEY_ID.
+        'key' => env('RAZORPAY_KEY') ?: env('RAZORPAY_KEY_ID'),
+        'secret' => env('RAZORPAY_SECRET') ?: env('RAZORPAY_KEY_SECRET'),
         // Separate secret from the Razorpay webhook settings page. Used only
         // to verify X-Razorpay-Signature on payment.captured / payment.failed.
         'webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),

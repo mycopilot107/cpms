@@ -93,8 +93,13 @@
             </a>
         @empty
             <div class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-                <p class="font-medium text-slate-700">No reports for these dates.</p>
-                <p class="mt-1 text-sm text-slate-500">Site staff file the daily report from the <strong>Daily report</strong> tab of the Android app.</p>
+                @if ($filters['from'] || $filters['to'] || $filters['project'] || $filters['user'])
+                    <p class="font-medium text-slate-700">No reports match these filters.</p>
+                    <p class="mt-1 text-sm text-slate-500">Clear the dates to see every saved report. Site staff file a report from the <strong>Daily report</strong> tab of the Android app.</p>
+                @else
+                    <p class="font-medium text-slate-700">No daily reports yet.</p>
+                    <p class="mt-1 text-sm text-slate-500">Site staff file the daily report from the <strong>Daily report</strong> tab of the Android app.</p>
+                @endif
             </div>
         @endforelse
     </div>

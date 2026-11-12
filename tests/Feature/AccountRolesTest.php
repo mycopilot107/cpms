@@ -70,14 +70,14 @@ class AccountRolesTest extends TestCase
             ->put(route('account.profile.update'), [
                 'name' => 'Renamed Person',
                 'email' => $user->email,
-                'phone' => '+91 99999 00000',
+                'phone' => '9999900000',
                 'role' => User::ROLE_OWNER,
             ])
             ->assertRedirect(route('account.profile'));
 
         $user->refresh();
         $this->assertSame('Renamed Person', $user->name);
-        $this->assertSame('+91 99999 00000', $user->phone);
+        $this->assertSame('9999900000', $user->phone);
         $this->assertSame(Role::idFor($role), $user->role_id);
     }
 

@@ -31,96 +31,73 @@
         } else {
             $navItems = [
                 ['url' => route('dashboard'), 'label' => 'Dashboard', 'active' => request()->routeIs('dashboard')],
-                ['url' => route('projects.index'), 'label' => 'Projects', 'active' => request()->routeIs('projects.*')],
-                ['url' => route('tasks.index'), 'label' => 'Tasks', 'active' => request()->routeIs('tasks.*')],
             ];
 
-            // Planning (calendar / Gantt / milestones) is available to every active member.
-            if ($user?->isActive()) {
-                $navItems[] = ['url' => route('planning.calendar'), 'label' => 'Planning', 'active' => request()->routeIs('planning.*') || request()->routeIs('milestones.*')];
-                $navItems[] = ['url' => route('daily-reports.index'), 'label' => 'Daily reports', 'active' => request()->routeIs('daily-reports.*')];
-            }
+            foreach (\App\Support\AppPages::LINKS as $key => $link) {
+                if (! $user?->canAccess($key)) {
+                    continue;
+                }
 
-            // Finance + Reports are limited to finance/report roles.
-            if ($user?->canViewFinance()) {
-                $navItems[] = ['url' => route('finance.index'), 'label' => 'Finance', 'active' => request()->routeIs('finance.*') || request()->routeIs('boq-items.*') || request()->routeIs('expenses.*') || request()->routeIs('project-payments.*')];
-            }
-            if ($user?->canViewReports()) {
-                $navItems[] = ['url' => route('reports.index'), 'label' => 'Reports', 'active' => request()->routeIs('reports.*')];
-            }
+                $navItems[] = [
+                    'url' => route($link['route']),
+                    'label' => \App\Support\AppPages::LABELS[$key],
+                    'active' => request()->routeIs(...$link['active']),
+                ];
 
-            if ($user?->isAdmin()) {
-                $navItems[] = ['url' => route('users.index'), 'label' => 'Team', 'active' => request()->routeIs('users.*')];
-                $navItems[] = ['url' => route('company.settings'), 'label' => 'Company', 'active' => request()->routeIs('company.*')];
-                $navItems[] = ['url' => route('subscription.plans'), 'label' => 'Billing', 'active' => request()->routeIs('subscription.*')];
+                if ($key === 'team' && $user?->isAdmin()) {
+                    $navItems[] = ['url' => route('roles.index'), 'label' => 'Roles', 'active' => request()->routeIs('roles.*')];
+                }
             }
 
             $storyAdmin = config('stories.admin_email');
             if ($storyAdmin && $user && strcasecmp(trim((string) $user->email), trim((string) $storyAdmin)) === 0) {
                 $navItems[] = ['url' => route('admin.stories.index'), 'label' => 'Stories', 'active' => request()->routeIs('admin.stories.*')];
             }
-
-            if ($user?->isActive()) {
-                $navItems[] = ['url' => route('stories.index'), 'label' => 'Share your story', 'active' => request()->routeIs('stories.*')];
-            }
         }
     @endphp
-    <nav class="bg-slate-900 text-slate-100">
-        <div class="mx-auto max-w-7xl px-4">
-            <div class="flex h-16 items-center justify-between">
-                <div class="flex items-center gap-8">
-                    <a href="{{ $isSuperAdmin ? route('platform.overview') : route('dashboard') }}" class="flex items-center gap-2 text-lg font-bold text-white">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-white">C</span>
-                        Best CPMS
-                    </a>
-                    <div class="hidden gap-1 md:flex">
-                        @foreach ($navItems as $item)
-                            <a href="{{ $item['url'] }}" class="rounded-md px-3 py-2 text-sm font-medium {{ $item['active'] ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">{{ $item['label'] }}</a>
-                        @endforeach
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="hidden text-right sm:block">
-                        <div class="text-sm font-medium text-white">{{ auth()->user()?->name }}</div>
-                        <div class="text-xs text-slate-400">{{ $company?->name }} · {{ auth()->user()?->role?->name }}</div>
-                    </div>
-                    <a href="{{ route('account.profile') }}" class="hidden rounded-md px-2 py-1.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white md:block {{ request()->routeIs('account.*') ? 'bg-slate-800 text-white' : '' }}">My account</a>
-                    <form method="POST" action="{{ route('logout') }}" class="hidden md:block">
-                        @csrf
-                        <button type="submit" class="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800">Log out</button>
-                    </form>
-                     <button type="button" id="mobile-menu-button" aria-controls="mobile-menu" aria-expanded="false"
-                            class="inline-flex items-center justify-center rounded-md p-2 text-slate-300 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500 md:hidden">
-                        <span class="sr-only">Toggle navigation menu</span>
-                        <svg id="mobile-menu-open" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                        </svg>
-                        <svg id="mobile-menu-close" class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
+    {{-- Keeps both translate utilities in the page so the CDN stylesheet never drops them. --}}
+    <span class="hidden -translate-x-full translate-x-0" aria-hidden="true"></span>
+    <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col bg-slate-900 text-slate-100 transition-transform md:translate-x-0">
+        <a href="{{ $isSuperAdmin ? route('platform.overview') : route('dashboard') }}" class="flex h-16 shrink-0 items-center gap-2 border-b border-slate-800 px-4 text-lg font-bold text-white">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-white">C</span>
+            Best CPMS
+        </a>
 
-        <div id="mobile-menu" class="hidden border-t border-slate-800 md:hidden">
-            <div class="space-y-1 px-2 py-3">
-                @foreach ($navItems as $item)
-                    <a href="{{ $item['url'] }}" class="block rounded-md px-3 py-2 text-base font-medium {{ $item['active'] ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">{{ $item['label'] }}</a>
-                @endforeach
+        <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Main">
+            @foreach ($navItems as $item)
+                <a href="{{ $item['url'] }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ $item['active'] ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">{{ $item['label'] }}</a>
+            @endforeach
+        </nav>
+
+        <div class="shrink-0 border-t border-slate-800 px-3 py-4">
+            <div class="px-3">
+                <div class="truncate text-sm font-medium text-white">{{ auth()->user()?->name }}</div>
+                <div class="truncate text-xs text-slate-400">{{ $company?->name }} · {{ auth()->user()?->role?->name }}</div>
             </div>
-            <div class="border-t border-slate-800 px-4 py-3">
-                <div class="text-sm font-medium text-white">{{ auth()->user()?->name }}</div>
-                <div class="text-xs text-slate-400">{{ $company?->name }} · {{ auth()->user()?->role?->name }}</div>
-                <a href="{{ route('account.profile') }}" class="mt-3 block rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">My account</a>
-                <a href="{{ route('account.password') }}" class="block rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">Change password</a>
-                <form method="POST" action="{{ route('logout') }}" class="mt-2">
-                    @csrf
-                    <button type="submit" class="w-full rounded-md border border-slate-700 px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800">Log out</button>
-                </form>
-            </div>
+            <a href="{{ route('account.profile') }}" class="mt-3 block rounded-md px-3 py-2 text-sm {{ request()->routeIs('account.*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">My account</a>
+            <form method="POST" action="{{ route('logout') }}" class="mt-1">
+                @csrf
+                <button type="submit" class="w-full rounded-md px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-800 hover:text-white">Log out</button>
+            </form>
         </div>
-    </nav>
+    </aside>
+
+    <div id="sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-slate-900/50 md:hidden"></div>
+
+    <div class="min-h-full md:pl-64">
+        <div class="sticky top-0 z-20 flex h-14 items-center gap-3 bg-slate-900 px-4 text-white md:hidden">
+            <button type="button" id="mobile-menu-button" aria-controls="app-sidebar" aria-expanded="false"
+                    class="inline-flex items-center justify-center rounded-md p-2 text-slate-300 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-500">
+                <span class="sr-only">Toggle navigation menu</span>
+                <svg id="mobile-menu-open" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+                <svg id="mobile-menu-close" class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <a href="{{ $isSuperAdmin ? route('platform.overview') : route('dashboard') }}" class="text-lg font-bold">Best CPMS</a>
+        </div>
 
     @php $activeSub = $company?->activeSubscription(); @endphp
     @if (! $isSuperAdmin && $company && $company->isOnTrial() && ! $activeSub)
@@ -141,13 +118,13 @@
     @endif
 
     <header class="bg-white shadow-sm">
-        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
             <h1 class="text-xl font-semibold text-slate-900">@yield('heading', 'Dashboard')</h1>
             <div class="flex flex-wrap items-center gap-2">@yield('actions')</div>
         </div>
     </header>
 
-    <main class="mx-auto max-w-7xl px-4 py-6">
+    <main class="px-4 py-6 sm:px-6">
         @if (session('status'))
             <div class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
                 {{ session('status') }}
@@ -167,23 +144,36 @@
 
         @yield('content')
     </main>
+    </div>
 </div>
 
 <script>
     (function () {
         var btn = document.getElementById('mobile-menu-button');
-        var menu = document.getElementById('mobile-menu');
+        var sidebar = document.getElementById('app-sidebar');
+        var backdrop = document.getElementById('sidebar-backdrop');
         var openIcon = document.getElementById('mobile-menu-open');
         var closeIcon = document.getElementById('mobile-menu-close');
-        if (!btn || !menu) return;
+        if (!btn || !sidebar || !backdrop) return;
+
+        function setOpen(open) {
+            // Set a positive translate when open. Removing the hide class alone
+            // leaves the menu off-screen, because no other transform rule applies below the desktop breakpoint.
+            sidebar.classList.toggle('-translate-x-full', !open);
+            sidebar.classList.toggle('translate-x-0', open);
+            backdrop.classList.toggle('hidden', !open);
+            btn.setAttribute('aria-expanded', String(open));
+            if (openIcon && closeIcon) {
+                openIcon.classList.toggle('hidden', open);
+                closeIcon.classList.toggle('hidden', !open);
+            }
+        }
 
         btn.addEventListener('click', function () {
-            var isHidden = menu.classList.toggle('hidden');
-            btn.setAttribute('aria-expanded', String(!isHidden));
-            if (openIcon && closeIcon) {
-                openIcon.classList.toggle('hidden', !isHidden);
-                closeIcon.classList.toggle('hidden', isHidden);
-            }
+            setOpen(sidebar.classList.contains('-translate-x-full'));
+        });
+        backdrop.addEventListener('click', function () {
+            setOpen(false);
         });
     })();
 </script>

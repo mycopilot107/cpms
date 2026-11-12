@@ -23,12 +23,15 @@
                 'country' => $company->country,
                 'currency' => $company->currency,
             ])
-            <p class="-mt-3 text-xs text-slate-500">The currency sets the symbol on budgets, BOQ, expenses, payments, and reports. Changing it later does not convert amounts already entered.</p>
+            <p class="-mt-3 text-xs text-slate-500">This currency is shown on every budget, BOQ line, expense, payment, and report. INR stays INR everywhere; any other choice is shown the same way. Changing it later does not convert amounts already entered.</p>
 
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                     <label for="phone" class="block text-sm font-medium text-slate-700">Phone</label>
-                    <input id="phone" name="phone" type="text" value="{{ old('phone', $company->phone) }}" class="{{ $inputClass }}">
+                    <input id="phone" name="phone" type="text" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" placeholder="10-digit number"
+                           value="{{ old('phone', \App\Support\Phone::normalize($company->phone) ?? '') }}"
+                           oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
+                           class="{{ $inputClass }} @error('phone') border-red-400 @enderror">
                     @error('phone')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
                 <div>

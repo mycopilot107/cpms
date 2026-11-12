@@ -15,7 +15,7 @@ class CompanySettingsController extends Controller
 {
     public function edit(Request $request): View
     {
-        abort_unless($request->user()->isAdmin(), 403);
+        abort_unless($request->user()->hasPage('company'), 403);
 
         return view('company.settings', ['company' => $request->user()->company]);
     }

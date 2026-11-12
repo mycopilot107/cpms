@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Formats a company's own project money (budget, BOQ, expenses, payments) in
- * the currency that company chose. Not used for the Best CPMS subscription
- * price — see App\Support\Currency for that.
+ * the currency that company chose, as "INR 1,250.00". Not used for the Best
+ * CPMS subscription price — see App\Support\Currency for that.
  */
 class Money
 {
@@ -34,13 +34,13 @@ class Money
         return (string) (static::currencies()[static::code($company)]['locale'] ?? 'en-US');
     }
 
-    /** "₹1,250.00", "$1,250.00", "AED 1,250.00". */
+    /** "INR 1,250.00", "USD 1,250.00". The code is the company's chosen currency. */
     public static function format(int|float|string|null $amount, ?Company $company = null): string
     {
         $value = (float) ($amount ?? 0);
         $sign = $value < 0 ? '-' : '';
 
-        return $sign.static::symbol($company).number_format(abs($value), 2);
+        return $sign.static::code($company).' '.number_format(abs($value), 2);
     }
 
     /**

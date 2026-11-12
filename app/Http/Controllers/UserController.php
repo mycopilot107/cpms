@@ -20,10 +20,7 @@ class UserController extends Controller
      */
     private function assignableRoles(): Collection
     {
-        return Role::query()
-            ->where('slug', '!=', User::ROLE_OWNER)
-            ->orderBy('sort_order')
-            ->get();
+        return Role::assignableFor(request()->user());
     }
 
     public function index(Request $request): View

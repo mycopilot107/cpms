@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Role;
 use App\Models\User;
+use App\Support\Phone;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -19,6 +21,10 @@ class UpdateUserRequest extends FormRequest
         if ($this->has('email')) {
             $this->merge(['email' => strtolower(trim((string) $this->input('email')))]);
         }
+
+        if ($this->exists('phone')) {
+            $this->merge(['phone' => Phone::normalize($this->input('phone'))]);
+        }
     }
 
     /**
@@ -29,12 +35,6 @@ class UpdateUserRequest extends FormRequest
         /** @var User $target */
         $target = $this->route('user');
 
-        // The owner's role/status are locked; everyone else is limited to the
-        // non-owner roles so ownership can't be reassigned through this form.
-        $roles = $target->isOwner()
-            ? [User::ROLE_OWNER]
-            : array_values(array_diff(User::ROLES, [User::ROLE_OWNER]));
-
         $statuses = $target->isOwner() ? ['active'] : ['active', 'inactive'];
 
         return [
@@ -43,10 +43,32 @@ class UpdateUserRequest extends FormRequest
                 'required', 'string', 'email', 'max:255',
                 Rule::unique('users', 'email')->ignore($target->id),
             ],
-            'phone' => ['nullable', 'string', 'max:30'],
-            'role' => ['required', Rule::in($roles)],
+            'phone' => Phone::rules(),
+            'role' => ['required', 'string', function (string $attribute, mixed $value, \Closure $fail) use ($target): void {
+                if ($target->isOwner()) {
+                    if ((string) $value !== User::ROLE_OWNER) {
+                        $fail('The company owner\'s role can\'t be changed.');
+                    }
+
+                    return;
+                }
+
+                if (! Role::canBeAssignedBy($this->user(), (string) $value)) {
+                    $fail('The selected role is invalid.');
+                }
+            }],
             'status' => ['required', Rule::in($statuses)],
             'password' => ['nullable', 'confirmed', Password::defaults()],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'phone.digits' => 'The phone number must be 10 digits.',
         ];
     }
 }

@@ -266,6 +266,6 @@ class SubscriptionController extends Controller
     /** Only owners and admins may manage billing. */
     private function authorizeBilling(Request $request): void
     {
-        abort_unless($request->user()->isAdmin(), 403, 'Only an owner or admin can manage billing.');
+        abort_unless($request->user()->hasPage('billing'), 403, 'Your role does not include billing.');
     }
 }

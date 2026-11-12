@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureAccountActive;
 use App\Http\Middleware\EnsureOutreachAccess;
+use App\Http\Middleware\EnsurePageAccess;
 use App\Http\Middleware\EnsureStoryAdmin;
 use App\Http\Middleware\EnsureSubscriptionActive;
 use App\Http\Middleware\EnsureSuperAdmin;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'subscription' => EnsureSubscriptionActive::class,
+            'page-access' => EnsurePageAccess::class,
             'story-admin' => EnsureStoryAdmin::class,
             'super-admin' => EnsureSuperAdmin::class,
             'outreach' => EnsureOutreachAccess::class,

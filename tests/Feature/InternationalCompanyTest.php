@@ -56,8 +56,8 @@ class InternationalCompanyTest extends TestCase
         $this->actingAs($owner)
             ->get(route('projects.show', $project))
             ->assertOk()
-            ->assertSee('$2,500.00')
-            ->assertDontSee('₹2,500.00');
+            ->assertSee('USD 2,500.00')
+            ->assertDontSee('INR 2,500.00');
     }
 
     public function test_admin_can_change_company_country_and_currency(): void
@@ -77,6 +77,31 @@ class InternationalCompanyTest extends TestCase
         $this->assertSame('United Kingdom', $company->country);
         $this->assertSame('GBP', $company->currency);
         $this->assertSame('GB123456789', $company->gst_number);
+    }
+
+    public function test_company_phone_must_be_ten_digits(): void
+    {
+        $owner = User::factory()->owner()->create();
+
+        $this->actingAs($owner)
+            ->put(route('company.settings.update'), [
+                'name' => $owner->company->name,
+                'country' => 'India',
+                'currency' => 'INR',
+                'phone' => '265556665$89898989',
+            ])
+            ->assertSessionHasErrors('phone');
+
+        $this->actingAs($owner)
+            ->put(route('company.settings.update'), [
+                'name' => $owner->company->name,
+                'country' => 'India',
+                'currency' => 'INR',
+                'phone' => '9876543210',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('9876543210', $owner->company->refresh()->phone);
     }
 
     public function test_worker_cannot_change_company_settings(): void

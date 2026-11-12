@@ -148,8 +148,8 @@
                                     </td>
                                     <td class="px-3 py-2 text-slate-600">{{ $line['data']['unit'] ?? '' }}</td>
                                     <td class="whitespace-nowrap px-3 py-2 text-right text-slate-700">{{ array_key_exists('quantity', $line['data']) ? $qty($line['data']['quantity']) : '' }}</td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-right text-slate-700">{{ isset($line['data']['rate']) ? number_format((float) $line['data']['rate'], 2) : '' }}</td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-right font-medium text-slate-900">{{ isset($line['data']['amount']) ? number_format((float) $line['data']['amount'], 2) : '' }}</td>
+                                    <td class="whitespace-nowrap px-3 py-2 text-right text-slate-700">{{ isset($line['data']['rate']) ? \App\Support\Money::format($line['data']['rate']) : '' }}</td>
+                                    <td class="whitespace-nowrap px-3 py-2 text-right font-medium text-slate-900">{{ isset($line['data']['amount']) ? \App\Support\Money::format($line['data']['amount']) : '' }}</td>
                                 @endif
                             </tr>
                         @endforeach

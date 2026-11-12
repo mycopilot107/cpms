@@ -31,10 +31,12 @@ use App\Http\Controllers\PlatformPaymentController;
 use App\Http\Controllers\PlatformSmtpController;
 use App\Http\Controllers\PlatformUserController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectImportController;
 use App\Http\Controllers\ProjectPaymentController;
 use App\Http\Controllers\ProjectShareController;
 use App\Http\Controllers\PublicWeeklyReportController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\SubscriptionController;
@@ -195,7 +197,7 @@ Route::middleware('guest')->group(function () {
 | logout and the trial-expired page must stay OUTSIDE the "subscription"
 | gate, otherwise an expired tenant would be caught in a redirect loop.
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'page-access'])->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     Route::view('subscription/expired', 'subscription.expired')->name('subscription.expired');
@@ -277,6 +279,21 @@ Route::middleware('auth')->group(function () {
     Route::middleware('subscription')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        // Project import from Excel/CSV. Registered before the resource so
+        // "import" is not captured as a project id.
+        Route::get('projects/import', [ProjectImportController::class, 'create'])->name('projects.import.create');
+        Route::get('projects/import/template', [ProjectImportController::class, 'template'])->name('projects.import.template');
+        Route::post('projects/import', [ProjectImportController::class, 'store'])
+            ->middleware('throttle:20,1')
+            ->name('projects.import.store');
+        Route::get('projects/import/{token}', [ProjectImportController::class, 'preview'])
+            ->where('token', '[A-Za-z0-9]{32}')
+            ->name('projects.import.preview');
+        Route::post('projects/import/{token}', [ProjectImportController::class, 'import'])
+            ->where('token', '[A-Za-z0-9]{32}')
+            ->middleware('throttle:20,1')
+            ->name('projects.import.confirm');
+
         Route::resource('projects', ProjectController::class);
         Route::get('projects/{project}/share', [ProjectShareController::class, 'index'])->name('projects.share');
         Route::post('projects/{project}/share', [ProjectShareController::class, 'store'])
@@ -296,6 +313,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('daily-report-photos/{photo}', [DailyReportController::class, 'destroyPhoto'])->name('daily-report-photos.destroy');
         Route::delete('task-photos/{photo}', [TaskPhotoController::class, 'destroy'])->name('task-photos.destroy');
         Route::resource('users', UserController::class)->except(['show']);
+        Route::resource('roles', RoleController::class)->except(['show']);
 
         /*
          | Planning — calendar + Gantt (all active users) and milestones CRUD

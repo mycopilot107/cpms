@@ -103,11 +103,42 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
-    /** Point this account at a role by its slug. role_id stays guarded. */
-    public function assignRole(string $slug): void
+    /**
+     * Point this account at a role by slug or id. role_id stays guarded.
+     */
+    public function assignRole(string|int $role): void
     {
-        $this->role_id = Role::idFor($slug);
+        $this->role_id = is_int($role) || ctype_digit((string) $role)
+            ? (int) $role
+            : Role::idFor((string) $role);
         $this->unsetRelation('role');
+    }
+
+    /** True when this role's page list includes the page. Owners always pass. */
+    public function hasPage(string $page): bool
+    {
+        if ($this->isOwner()) {
+            return true;
+        }
+
+        return in_array($page, $this->role?->pageKeys() ?? [], true);
+    }
+
+    /**
+     * Whether this user may open a page. Dashboard is open to every active
+     * user so signing in always has somewhere to land.
+     */
+    public function canAccess(string $page): bool
+    {
+        if (! $this->isActive()) {
+            return false;
+        }
+
+        if ($page === 'dashboard') {
+            return true;
+        }
+
+        return $this->hasPage($page);
     }
 
     /*
@@ -175,7 +206,7 @@ class User extends Authenticatable
 
     public function canViewFinance(): bool
     {
-        return $this->isActive() && in_array($this->role?->slug, self::FINANCE_ROLES, true);
+        return $this->isActive() && $this->hasPage('finance');
     }
 
     public function canManageFinance(): bool
@@ -185,7 +216,7 @@ class User extends Authenticatable
 
     public function canViewReports(): bool
     {
-        return $this->isActive() && in_array($this->role?->slug, self::FINANCE_ROLES, true);
+        return $this->isActive() && $this->hasPage('reports');
     }
 
     public function canManagePlanning(): bool

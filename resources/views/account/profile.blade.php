@@ -65,8 +65,11 @@
                 @endif
 
                 <div>
-                    <label for="phone" class="block text-sm font-medium text-slate-700">Phone <span class="text-slate-400">(optional)</span></label>
-                    <input id="phone" name="phone" type="text" value="{{ old('phone', $user->phone) }}" class="{{ $inputClass }}">
+                    <label for="phone" class="block text-sm font-medium text-slate-700">Phone <span class="text-slate-400">(optional, 10 digits)</span></label>
+                    <input id="phone" name="phone" type="text" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" placeholder="10-digit number"
+                           value="{{ old('phone', \App\Support\Phone::normalize($user->phone) ?? '') }}"
+                           oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
+                           class="{{ $inputClass }} @error('phone') border-red-400 @enderror">
                     @error('phone')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
 

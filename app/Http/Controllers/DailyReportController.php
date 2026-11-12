@@ -85,24 +85,26 @@ class DailyReportController extends Controller
     }
 
     /**
-     * @return array{project: ?int, user: ?int, from: string, to: string}
+     * @return array{project: ?int, user: ?int, from: ?string, to: ?string}
      */
     private function filters(Request $request): array
     {
-        $date = fn (string $key, string $default): string => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $request->query($key))
-            ? (string) $request->query($key)
-            : $default;
+        $date = function (string $key) use ($request): ?string {
+            $value = (string) $request->query($key, '');
+
+            return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1 ? $value : null;
+        };
 
         return [
             'project' => $request->integer('project') ?: null,
             'user' => $request->integer('user') ?: null,
-            'from' => $date('from', today()->subDays(13)->toDateString()),
-            'to' => $date('to', today()->toDateString()),
+            'from' => $date('from'),
+            'to' => $date('to'),
         ];
     }
 
     /**
-     * @param  array{project: ?int, user: ?int, from: string, to: string}  $filters
+     * @param  array{project: ?int, user: ?int, from: ?string, to: ?string}  $filters
      * @return Builder<DailyReport>
      */
     private function filteredQuery(Request $request, array $filters): Builder
@@ -113,8 +115,8 @@ class DailyReportController extends Controller
             ->when(! $canViewAll, fn ($q) => $q->where('user_id', $request->user()->id))
             ->when($canViewAll && $filters['user'], fn ($q) => $q->where('user_id', $filters['user']))
             ->when($filters['project'], fn ($q) => $q->where('project_id', $filters['project']))
-            ->whereDate('report_date', '>=', $filters['from'])
-            ->whereDate('report_date', '<=', $filters['to']);
+            ->when($filters['from'], fn ($q) => $q->whereDate('report_date', '>=', $filters['from']))
+            ->when($filters['to'], fn ($q) => $q->whereDate('report_date', '<=', $filters['to']));
     }
 
     /**

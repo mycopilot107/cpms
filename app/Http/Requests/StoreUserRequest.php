@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Role;
 use App\Models\User;
+use App\Support\Phone;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -19,6 +21,10 @@ class StoreUserRequest extends FormRequest
     {
         if ($this->has('email')) {
             $this->merge(['email' => strtolower(trim((string) $this->input('email')))]);
+        }
+
+        if ($this->exists('phone')) {
+            $this->merge(['phone' => Phone::normalize($this->input('phone'))]);
         }
     }
 
@@ -46,17 +52,27 @@ class StoreUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        // New users can be given any role except owner (there is exactly one
-        // owner, created at registration).
-        $assignableRoles = array_values(array_diff(User::ROLES, [User::ROLE_OWNER]));
-
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
-            'phone' => ['nullable', 'string', 'max:30'],
-            'role' => ['required', Rule::in($assignableRoles)],
+            'phone' => Phone::rules(),
+            'role' => ['required', 'string', function (string $attribute, mixed $value, \Closure $fail): void {
+                if (! Role::canBeAssignedBy($this->user(), (string) $value)) {
+                    $fail('The selected role is invalid.');
+                }
+            }],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'password' => ['required', 'confirmed', Password::defaults()],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'phone.digits' => 'The phone number must be 10 digits.',
         ];
     }
 }

@@ -6,21 +6,21 @@ use App\Models\User;
 
 class UserPolicy
 {
-    /** Only owners/admins manage the team roster. */
+    /** Owners, admins, and any role whose pages include Team. */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $this->managesTeam($user);
     }
 
     public function view(User $user, User $model): bool
     {
         return $this->sameCompany($user, $model)
-            && ($user->isAdmin() || $user->id === $model->id);
+            && ($this->managesTeam($user) || $user->id === $model->id);
     }
 
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $this->managesTeam($user);
     }
 
     public function update(User $user, User $model): bool
@@ -29,9 +29,9 @@ class UserPolicy
             return false;
         }
 
-        // The team form also sets role and status, so only owners/admins use
-        // it. Everyone edits their own name, email, and phone under My account.
-        if (! $user->isAdmin()) {
+        // The team form also sets role and status. Everyone edits their own
+        // name, email, and phone under My account.
+        if (! $this->managesTeam($user)) {
             return false;
         }
 
@@ -55,8 +55,14 @@ class UserPolicy
         }
 
         // Admins can delete non-admins; only the owner can delete an admin.
-        return $user->isAdmin()
+        return $this->managesTeam($user)
             && ($user->isOwner() || ! $model->hasRole(User::ROLE_ADMIN));
+    }
+
+    /** Owners, admins, or a role that was given the Team page. */
+    private function managesTeam(User $user): bool
+    {
+        return $user->isAdmin() || $user->hasPage('team');
     }
 
     /** Tenant guard: both users must belong to the same company. */

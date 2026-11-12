@@ -4,6 +4,9 @@
 @section('heading', 'Team')
 
 @section('actions')
+    @if (auth()->user()?->isAdmin())
+        <a href="{{ route('roles.index') }}" class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Roles</a>
+    @endif
     @can('create', App\Models\User::class)
         <a href="{{ route('users.create') }}" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Add member</a>
     @endcan

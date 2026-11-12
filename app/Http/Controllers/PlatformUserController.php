@@ -13,7 +13,7 @@ class PlatformUserController extends Controller
     public function index(Request $request): View
     {
         $search = trim((string) $request->query('q', ''));
-        $roles = Role::query()->orderBy('sort_order')->get();
+        $roles = Role::query()->whereNull('company_id')->orderBy('sort_order')->get();
 
         $role = (string) $request->query('role', 'all');
         if ($role !== 'all' && ! $roles->contains('slug', $role)) {

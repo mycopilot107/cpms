@@ -5,6 +5,7 @@
 
 @section('actions')
     @can('create', App\Models\Project::class)
+        <a href="{{ route('projects.import.create') }}" class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Import from Excel</a>
         <a href="{{ route('projects.create') }}" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">New project</a>
     @endcan
 @endsection
@@ -49,7 +50,8 @@
                         <td colspan="5" class="px-5 py-10 text-center text-sm text-slate-400">
                             No projects yet.
                             @can('create', App\Models\Project::class)
-                                <a href="{{ route('projects.create') }}" class="text-indigo-600 hover:text-indigo-500">Create the first one</a>.
+                                <a href="{{ route('projects.create') }}" class="text-indigo-600 hover:text-indigo-500">Create one</a>
+                                or <a href="{{ route('projects.import.create') }}" class="text-indigo-600 hover:text-indigo-500">import from Excel</a>.
                             @endcan
                         </td>
                     </tr>
@@ -93,7 +95,8 @@
             <div class="rounded-xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-400">
                 No projects yet.
                 @can('create', App\Models\Project::class)
-                    <a href="{{ route('projects.create') }}" class="text-indigo-600 hover:text-indigo-500">Create the first one</a>.
+                    <a href="{{ route('projects.create') }}" class="text-indigo-600 hover:text-indigo-500">Create one</a>
+                    or <a href="{{ route('projects.import.create') }}" class="text-indigo-600 hover:text-indigo-500">import from Excel</a>.
                 @endcan
             </div>
         @endforelse

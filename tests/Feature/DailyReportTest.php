@@ -202,6 +202,31 @@ class DailyReportTest extends TestCase
             ->assertSee('20 labour');
     }
 
+    public function test_reports_older_than_two_weeks_stay_on_the_list(): void
+    {
+        [$engineer, $project] = $this->engineerWithProject();
+        DailyReport::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $engineer->id,
+            'report_date' => today()->subDays(40),
+            'work_done' => 'Foundation stone laid.',
+        ]);
+        $manager = User::factory()->forCompany($engineer->company)->create(['role_id' => Role::idFor(User::ROLE_MANAGER)]);
+
+        $this->actingAs($manager)
+            ->get(route('daily-reports.index'))
+            ->assertOk()
+            ->assertSee('Foundation stone laid.');
+
+        $this->actingAs($manager)
+            ->get(route('daily-reports.index', [
+                'from' => today()->subDays(7)->toDateString(),
+                'to' => today()->toDateString(),
+            ]))
+            ->assertOk()
+            ->assertDontSee('Foundation stone laid.');
+    }
+
     public function test_reports_export_to_csv(): void
     {
         [$engineer, $project] = $this->engineerWithProject();

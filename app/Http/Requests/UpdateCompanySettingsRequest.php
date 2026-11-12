@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Support\Money;
+use App\Support\Phone;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -11,7 +12,14 @@ class UpdateCompanySettingsRequest extends FormRequest
     /** Only owners and admins change the company profile. */
     public function authorize(): bool
     {
-        return (bool) $this->user()?->isAdmin();
+        return (bool) $this->user()?->hasPage('company');
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->exists('phone')) {
+            $this->merge(['phone' => Phone::normalize($this->input('phone'))]);
+        }
     }
 
     /**
@@ -21,7 +29,7 @@ class UpdateCompanySettingsRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:30'],
+            'phone' => Phone::rules(),
             'address' => ['nullable', 'string', 'max:1000'],
             'city' => ['nullable', 'string', 'max:120'],
             'state' => ['nullable', 'string', 'max:120'],
@@ -39,6 +47,16 @@ class UpdateCompanySettingsRequest extends FormRequest
         return [
             'name' => 'company name',
             'gst_number' => 'tax ID',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'phone.digits' => 'The phone number must be 10 digits.',
         ];
     }
 }
